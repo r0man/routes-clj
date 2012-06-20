@@ -1,10 +1,8 @@
 (ns routes.test
   (:require [routes.test.core :as core]
-            [routes.test.routes :as routes]
-            [routes.test.util :as util]))
+            [routes.test.helper :as helper]))
 
 (defn ^:export run []
   (core/test)
-  (routes/test)
-  (util/test)
+  (helper/test)
   "All tests passed.")

@@ -1,6 +1,6 @@
-(ns routes.test.util
+(ns routes.test.helper
   (:use clojure.test
-        routes.util))
+        routes.helper))
 
 (deftest test-routes
   (is (nil? (route :unknown-route))))

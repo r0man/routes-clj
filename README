@@ -1,0 +1,33 @@
+# ROUTES-CLJ
+
+A Clojure & ClojureScript library to build url and path fns.
+
+## Usage
+
+(use 'routes.core)
+
+(defroute continents []
+  "/continents")
+
+(continents-path)
+;=> "/continents"
+
+(continents-url)
+;=> "https://example.com/continents"
+
+(def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
+
+(defroute continent [continent]
+  "/continents/:iso-3166-1-alpha-2-:name")
+
+(continent-path europe)
+;=> "/continents/eu-europe"
+
+(continent-url europe)
+;=> "https://example.com/continents/eu-europe"
+
+## License
+
+Copyright © 2012 Roman Scherer
+
+Distributed under the Eclipse Public License, the same as Clojure.

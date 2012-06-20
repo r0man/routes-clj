@@ -1,4 +1,4 @@
-(ns routes.util
+(ns routes.helper
   (:refer-clojure :exclude (replace))
   (:use [clojure.string :only (blank? join lower-case split replace replace-first)]
         [inflections.core :only (parameterize)]))
