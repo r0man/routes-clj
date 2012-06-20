@@ -2,6 +2,14 @@
   (:use clojure.test
         routes.util))
 
+(deftest test-routes
+  (is (nil? (route :unknown-route))))
+
+(deftest test-register
+  (let [example-route {:name :example-route}]
+    (register example-route)
+    (is (= example-route (get @*routes* (:name example-route))))))
+
 (deftest test-format-pattern
   (are [pattern args expected]
     (is (= expected (apply format-pattern pattern args)))
