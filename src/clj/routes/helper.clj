@@ -1,7 +1,7 @@
 (ns routes.helper
   (:refer-clojure :exclude (replace))
-  (:use [clojure.string :only (blank? join lower-case split replace replace-first)]
-        [inflections.core :only (parameterize)]))
+  (:use [clojure.string :only [blank? join lower-case split replace replace-first]]
+        [inflections.core :only [parameterize]]))
 
 (def ^:dynamic *server*
   {:scheme :https :server-name "example.com"})

@@ -4,7 +4,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[inflections "0.7.0-SNAPSHOT"]
-                 [org.clojure/clojure "1.4.0"]]
+                 [org.clojure/clojure "1.4.0"]
+                 [org.clojure/clojurescript "0.0-1424"]]
   :plugins [[lein-cljsbuild "0.2.1"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:source-path "src/cljs"
@@ -29,4 +30,4 @@
                "firefox" ["firefox" "http://http://localhost:9000/"]}
               :test-commands {"unit" ["./test-cljs.sh"]}}
   :source-paths ["src/clj"]
-  :test-paths ["test/clj"])
+  :test-paths) ["test/clj"]
