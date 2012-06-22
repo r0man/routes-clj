@@ -30,4 +30,4 @@
                "firefox" ["firefox" "http://http://localhost:9000/"]}
               :test-commands {"unit" ["./test-cljs.sh"]}}
   :source-paths ["src/clj"]
-  :test-paths) ["test/clj"]
+  :test-paths ["test/clj"])
