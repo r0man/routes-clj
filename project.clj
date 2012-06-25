@@ -3,15 +3,16 @@
   :url "http://github.com/r0man/routes-clj"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :min-lein-version "2.0.0"
   :dependencies [[inflections "0.7.0-SNAPSHOT"]
                  [org.clojure/clojure "1.4.0"]
                  [org.clojure/clojurescript "0.0-1424"]]
   :plugins [[lein-cljsbuild "0.2.1"]]
   :hooks [leiningen.cljsbuild]
-  :cljsbuild {:builds [{:source-path "src/cljs"
-                        :compiler {:output-to "target/routes-debug.js"
+  :cljsbuild {:builds [{:compiler {:output-to "target/routes-debug.js"
                                    :optimizations :whitespace
-                                   :pretty-print true}}
+                                   :pretty-print true}
+                        :source-path "src/cljs"}
                        {:compiler {:output-to "target/routes.js"
                                    :optimizations :advanced
                                    :pretty-print false}
@@ -19,8 +20,8 @@
                        {:compiler {:output-to "target/routes-test.js"
                                    :optimizations :advanced
                                    :pretty-print true}
-                        :jar true
-                        :source-path "test/cljs"}]
+                        :source-path "test/cljs"
+                        :jar true}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
               :crossovers [routes.helper]
