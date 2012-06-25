@@ -1,7 +1,7 @@
 (ns routes.core
   (:refer-clojure :exclude (replace))
-  (:use [clojure.string :only [upper-case replace]]
-        [routes.helper :only [parse-keys]]))
+  (:require [clojure.string :refer [upper-case replace]]
+            [routes.helper :refer [parse-keys]]))
 
 (defmacro defroute [name args pattern]
   (let [name# name args# args pattern# pattern]
