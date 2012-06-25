@@ -35,19 +35,3 @@
   (let [server {:scheme :https :server-name "another-example.com"}]
     (with-server server
       (is (= server *server*)))))
-
-(defroute continents []
-  "/continents")
-
-(continents-path)
-
-(continents-url)
-
-(defroute continent [continent]
-  "/continents/:iso-3166-1-alpha-2-:name")
-
-(def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
-
-(continent-path europe)
-
-(continent-url europe)
