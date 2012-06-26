@@ -6,25 +6,41 @@ A Clojure & ClojureScript library to build url and path fns.
 
 (use 'routes.core)
 
-(defroute continents []
-  "/continents")
-
-(continents-path)
-;=> "/continents"
-
-(continents-url)
-;=> "https://example.com/continents"
+;; Define some routes.
 
 (def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
+
+(defroute continents []
+  "/continents")
 
 (defroute continent [continent]
   "/continents/:iso-3166-1-alpha-2-:name")
 
+(defroute countries-in-continent [continent]
+  "/continents/:iso-3166-1-alpha-2-:name/countries")
+
+;; Build paths.
+
+(continents-path)
+;=> "/continents"
+
 (continent-path europe)
 ;=> "/continents/eu-europe"
 
-(continent-url europe)
-;=> "https://example.com/continents/eu-europe"
+(countires-in-continent-path europe)
+;=> "/continents/eu-europe/countries"
+
+;; Build urls.
+(with-server {:server-name "example.com"}
+
+  (continents-url)
+  ;=> "https://example.com/continents"
+
+  (continent-url europe)
+  ;=> "https://example.com/continents/eu-europe"
+
+  (countires-in-continent-url europe)
+  ;=> "https://example.com//continents/eu-europe/countries"
 
 ## License
 
