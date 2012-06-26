@@ -18,10 +18,10 @@
          (defn ^:export ~(symbol (str name# "-path")) [~@args#]
            (routes.helper/format-pattern ~pattern# ~@args#))
          (defn ^:export ~(symbol (str name# "-url")) [~@args#]
-           (str (routes.helper/server-url)
+           (str (routes.server/server-url routes.server/*server*)
                 (routes.helper/format-pattern ~pattern# ~@args#))))))
 
 (defmacro with-server [server & body]
   "Evaluate `body` with *server* bound to `server`."
-  `(binding [routes.helper/*server* ~server]
+  `(binding [routes.server/*server* ~server]
      ~@body))
