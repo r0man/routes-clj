@@ -40,7 +40,7 @@ A Clojure & ClojureScript library to build url and path fns.
   ;=> "https://example.com/continents/eu-europe"
 
   (countries-in-continent-url europe)
-  ;=> "https://example.com//continents/eu-europe/countries"
+  ;=> "https://example.com/continents/eu-europe/countries"
 
 ## License
 
