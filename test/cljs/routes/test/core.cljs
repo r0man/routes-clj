@@ -1,6 +1,6 @@
 (ns routes.test.core
-  (:use [routes.helper :only [format-pattern parse-keys route]]
-        [routes.server :only [*server* example-server server-url]])
+  (:use [routes.helper :only [route]]
+        [routes.server :only [example-server]])
   (:use-macros [routes.core :only [defroute with-server]]))
 
 (def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
