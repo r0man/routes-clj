@@ -3,12 +3,17 @@
   (:require [clojure.string :refer [blank? join lower-case split replace replace-first]]
             [inflections.core :refer [parameterize]]))
 
-(def ^:dynamic *server*
-  {:scheme :https :server-name "example.com"})
-
 (def ^:dynamic *routes* (atom {}))
 
 (defrecord Route [name args pattern params])
+
+(defn link-to
+  "Wraps some content in a HTML hyperlink with the supplied URL."
+  [& args]
+  (let [href (if (string? (first args)) (first args))
+        content (rest args)
+        content (if-not (empty? content) content)]
+    [:a {:href href} content]))
 
 (defn route
   "Lookup a route by `name`."
@@ -54,10 +59,3 @@
                (parameterize (lower-case (str (get arg %2)))))
              pattern keyseq))
    pattern (map vector (parse-keys pattern) args)))
-
-(defn server-url []
-  (let [{:keys [scheme server-name server-port]} *server*]
-    (assert scheme)
-    (assert server-name)
-    (str (name scheme) "://" server-name
-         (if server-port (str ":" server-port)))))

@@ -2,6 +2,14 @@
   (:use clojure.test
         routes.helper))
 
+(deftest link-to-test
+  (is (= (link-to "http://example.com/")
+         [:a {:href "http://example.com/"} nil]))
+  (is (= (link-to "http://example.com/" "foo")
+         [:a {:href "http://example.com/"} (list "foo")]))
+  (is (= (link-to "http://example.com/" "foo" "bar")
+         [:a {:href "http://example.com/"} (list "foo" "bar")])))
+
 (deftest test-routes
   (is (nil? (route :unknown-route))))
 
@@ -65,6 +73,3 @@
     [[:iso-3166-1-alpha-2 :name]]
     "/:a/:b-:c/d/:e-f-g"
     [[:a] [:b :c] [:e-f-g]]))
-
-(deftest test-server-url
-  (is (= "https://example.com" (server-url))))
