@@ -24,7 +24,8 @@
                         :jar true}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
-              :crossovers [routes.helper]
+              :crossovers [routes.helper
+                           routes.server]
               :repl-listen-port 9000
               :repl-launch-commands
               {"chromium" ["chromium" "http://localhost:9000/"]

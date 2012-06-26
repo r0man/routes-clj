@@ -3,7 +3,9 @@
   (:require [clojure.string :refer [upper-case replace]]
             [routes.helper :refer [parse-keys]]))
 
-(defmacro defroute [name args pattern]
+(defmacro defroute
+  "Define a route."
+  [name args pattern]
   (let [name# name args# args pattern# pattern]
     `(do (routes.helper/register
           (routes.helper/map->Route
@@ -20,5 +22,6 @@
                 (routes.helper/format-pattern ~pattern# ~@args#))))))
 
 (defmacro with-server [server & body]
+  "Evaluate `body` with *server* bound to `server`."
   `(binding [routes.helper/*server* ~server]
      ~@body))
