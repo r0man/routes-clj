@@ -16,7 +16,7 @@
 (deftest test-register
   (let [example-route {:name :example-route}]
     (register example-route)
-    (is (= example-route (get @*routes* (:name example-route))))))
+    (is (= example-route (route (:name example-route))))))
 
 (deftest test-format-pattern
   (are [pattern args expected]

@@ -21,7 +21,7 @@
 
 (defn register
   "Register `route` by it's name."
-  [route] (swap! *routes* assoc (:name route) route))
+  [route] (swap! *routes* assoc (keyword (:name route)) route))
 
 (defn identifier [resource keyseq]
   (->> (map resource keyseq)
