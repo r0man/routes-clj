@@ -6,8 +6,8 @@
   :min-lein-version "2.0.0"
   :dependencies [[inflections "0.7.0-SNAPSHOT"]
                  [org.clojure/clojure "1.4.0"]
-                 [org.clojure/clojurescript "0.0-1424"]]
-  :plugins [[lein-cljsbuild "0.2.1"]]
+                 [org.clojure/clojurescript "0.0-1443"]]
+  :plugins [[lein-cljsbuild "0.2.2"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-debug.js"
                                    :optimizations :whitespace
