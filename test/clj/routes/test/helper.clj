@@ -73,3 +73,13 @@
     [[:iso-3166-1-alpha-2 :name]]
     "/:a/:b-:c/d/:e-f-g"
     [[:a] [:b :c] [:e-f-g]]))
+
+(deftest test-parse-url
+  (are [url expected]
+    (is (= expected (parse-url url)))
+    "api.burningswell.com"
+    {:scheme :https :server-name "api.burningswell.com" :server-port nil :uri nil}
+    "api.burningswell.com:80"
+    {:scheme :https :server-name "api.burningswell.com" :server-port 80 :uri nil}
+    "http://api.burningswell.com:81/base"
+    {:scheme :http :server-name "api.burningswell.com" :server-port 81 :uri "/base"}))

@@ -1,7 +1,8 @@
 (ns routes.helper
   (:refer-clojure :exclude (replace))
   (:require [clojure.string :refer [blank? join lower-case split replace replace-first]]
-            [inflections.core :refer [parameterize]]))
+            [inflections.core :refer [parameterize]]
+            [inflections.number :refer [parse-integer]]))
 
 (def ^:dynamic *routes* (atom {}))
 
@@ -50,6 +51,13 @@
                    (apply vector))))
        (remove empty?)
        (apply vector)))
+
+(defn parse-url [url]
+  (if-let [matches (re-find #"(([^:]+)://)?([^:/]+)(:(\d+))?(/.*)?" url)]
+    {:scheme (keyword (or (nth matches 2) :https))
+     :server-name (nth matches 3)
+     :server-port (parse-integer (nth matches 5 nil))
+     :uri (nth matches 6)}))
 
 (defn format-pattern [pattern & args]
   (reduce
