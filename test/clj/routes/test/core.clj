@@ -35,5 +35,15 @@
         (is (= [[:iso-3166-1-alpha-2 :name]] (:params route)))))))
 
 (deftest test-with-server
-  (let [server {:scheme :https :server-name "another-example.com"}]
-    (with-server server (is (= server *server*)))))
+  (with-server {:scheme :https :server-name "other.com"}
+    (is (= {:scheme :https :server-name "other.com"} *server*))
+    (defroute continents []
+      "/continents")
+    (is (= "https://other.com/continents" (continents-url))))
+  (is (= "https://other.com/continents" (continents-url)))
+  (with-server "http://another.com:88"
+    (is (= (parse-url "http://another.com:88") *server*))
+    (defroute continents []
+      "/continents")
+    (is (= "http://another.com:88/continents" (continents-url))))
+  (is (= "http://another.com:88/continents" (continents-url))))
