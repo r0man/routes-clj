@@ -8,7 +8,7 @@
   "Define a route."
   [name args pattern]
   (let [name# name args# args pattern# pattern]
-    `(let [server# routes.server/*server*]
+    `(do
        (routes.helper/register
         (routes.helper/map->Route
          {:name ~(keyword name#)
@@ -21,12 +21,12 @@
        (defn ^:export ~(symbol (str name# "-path")) [~@args#]
          (routes.helper/format-pattern ~pattern# ~@args#))
        (defn ^:export ~(symbol (str name# "-url")) [~@args#]
-         (str (routes.server/server-url (or routes.server/*server* server#))
+         (str (routes.server/server-url
+               (or routes.server/*server*
+                   (:server (routes.helper/route ~(keyword name#)))))
               (routes.helper/format-pattern ~pattern# ~@args#))))))
 
 (defmacro with-server [server & body]
   "Evaluate `body` with *server* bound to `server`."
-  (let [server (if (string? server) (parse-url server) server)]
-    (binding [*server* server]
-      `(binding [routes.server/*server* ~server]
-         ~@body))))
+  `(binding [routes.server/*server* (routes.server/parse-server ~server)]
+     ~@body))

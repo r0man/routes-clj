@@ -1,9 +1,14 @@
-(ns routes.server)
+(ns routes.server
+  (:require [routes.helper :refer [parse-url]]))
 
 (def ^:dynamic *server* nil)
 
-(def example-server
+(def example
   {:scheme :https :server-name "example.com"})
+
+(defn parse-server [server]
+  (if (string? server)
+    (parse-url server) server))
 
 (defn server-url
   "Returns the url of `server`."

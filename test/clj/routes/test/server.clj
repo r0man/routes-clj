@@ -3,6 +3,7 @@
         routes.server))
 
 (deftest test-server-url
+  (is (= "https://example.com" "https://example.com"))
   (is (= "https://example.com" (server-url {:server-name "example.com"})))
-  (is (= "https://example.com" (server-url example-server)))
-  (is (= "http://example.com" (server-url (assoc example-server :scheme :http)))))
+  (is (= "https://example.com" (server-url example)))
+  (is (= "http://example.com" (server-url (assoc example :scheme :http)))))
