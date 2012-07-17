@@ -9,23 +9,22 @@
                  [org.clojure/clojurescript "0.0-1443"]]
   :plugins [[lein-cljsbuild "0.2.4"]]
   :hooks [leiningen.cljsbuild]
-  :cljsbuild {:builds [{:compiler {:output-to "target/routes-debug.js"
+  :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
+                                   :optimizations :advanced
+                                   :pretty-print true}
+                        :source-path "test/cljs"}
+                       {:compiler {:output-to "target/routes-debug.js"
                                    :optimizations :whitespace
                                    :pretty-print true}
-                        :source-path "src/cljs"}
+                        :source-path "test/cljs"}
                        {:compiler {:output-to "target/routes.js"
                                    :optimizations :advanced
-                                   :pretty-print false}
-                        :source-path "src/cljs"}
-                       {:compiler {:output-to "target/routes-test.js"
-                                   :optimizations :advanced
                                    :pretty-print true}
-                        :source-path "test/cljs"
+                        :source-path "src/cljs"
                         :jar true}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
-              :crossovers [routes.helper
-                           routes.server]
+              :crossovers [routes.helper routes.server]
               :repl-listen-port 9000
               :repl-launch-commands
               {"chromium" ["chromium" "http://localhost:9000/"]
