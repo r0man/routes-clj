@@ -6,16 +6,18 @@
 
 (defmacro defroute
   "Define a route."
-  [name args pattern]
+  [name args pattern & {:as options}]
   (let [name# name args# args pattern# pattern]
     `(do
        (routes.helper/register
         (routes.helper/map->Route
-         {:name ~(keyword name#)
-          :args (quote ~args#)
-          :pattern ~pattern#
-          :params ~(parse-keys pattern#)
-          :server routes.server/*server*}))
+         (merge
+          {:name ~(keyword name#)
+           :args (quote ~args#)
+           :pattern ~pattern#
+           :params ~(parse-keys pattern#)
+           :server routes.server/*server*}
+          ~options)))
        (defn ^:export ~(symbol (str name# "-route")) []
          (routes.helper/route ~(keyword name#)))
        (defn ^:export ~(symbol (str name# "-path")) [~@args#]

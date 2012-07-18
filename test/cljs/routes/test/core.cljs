@@ -14,6 +14,11 @@
   (defroute continent [continent]
     "/continents/:iso-3166-1-alpha-2-:name"))
 
+(defroute countries []
+  "/countries" :server example)
+
+;; CONTINENTS
+
 (defn test-continents-path []
   (assert (= "/continents" (continents-path))))
 
@@ -27,7 +32,8 @@
     (assert (= "/continents" (:pattern route)))
     (assert (= [] (:args route)))
     (assert (= :continents (:name route)))
-    (assert (= [] (:params route)))))
+    (assert (= [] (:params route)))
+    (assert (= example (:server route)))))
 
 (defn test-continent-path []
   (assert (= "/continents/eu-europe" (continent-path europe))))
@@ -45,10 +51,31 @@
     (assert (= [[:iso-3166-1-alpha-2 :name]] (:params route)))
     (assert (= {:scheme :https, :server-name "example.com"} (:server route)))))
 
+;; COUNTRIES
+
+(defn test-countries-path []
+  (assert (= "/countries" (countries-path))))
+
+(defn test-countries-url []
+  (assert (= "https://example.com/countries" (countries-url))))
+
+(defn test-countries-route []
+  (let [route (route :countries)]
+    (assert (= route (countries-route)))
+    (assert (instance? routes.helper.Route route))
+    (assert (= "/countries" (:pattern route)))
+    (assert (= [] (:args route)))
+    (assert (= :countries (:name route)))
+    (assert (= [] (:params route)))
+    (assert (= example (:server route)))))
+
 (defn test []
   (test-continents-path)
   (test-continents-url)
   (test-continents-route)
   (test-continent-path)
   (test-continent-url)
-  (test-continent-route))
+  (test-continent-route)
+  (test-countries-path)
+  (test-countries-url)
+  (test-countries-route))
