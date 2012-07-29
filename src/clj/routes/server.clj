@@ -3,6 +3,10 @@
 
 (def ^:dynamic *server* nil)
 
+(def ^:dynamic *ports*
+  {:http 80
+   :https 443})
+
 (def example
   {:scheme :https :server-name "example.com"})
 
@@ -15,4 +19,11 @@
   [{:keys [scheme server-name server-port] :as server}]
   (assert server-name "Can't build server url without a server name")
   (str (name (or scheme :https)) "://" server-name
-       (if server-port (str ":" server-port))))
+       (if (and server-port (not (= server-port (get *ports* scheme))))
+         (str ":" server-port))))
+
+(defn wrap-server
+  [handler]
+  (fn [request]
+    (binding [*server* request]
+      (handler request))))
