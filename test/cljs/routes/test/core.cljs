@@ -1,6 +1,6 @@
 (ns routes.test.core
   (:use [routes.helper :only [route]]
-        [routes.server :only [example]])
+        [routes.server :only [example parse-server]])
   (:use-macros [routes.core :only [defroute with-server]]))
 
 (def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
@@ -12,7 +12,16 @@
     "/continents")
 
   (defroute continent [continent]
-    "/continents/:iso-3166-1-alpha-2-:name"))
+    "/continents/:iso-3166-1-alpha-2-:name"
+    :server *server*)
+
+  (defroute languages []
+    "/languages"
+    :server "http://api.other.com")
+
+  (defroute language [continent]
+    "/languages/:iso-639-1-:name"
+    :server {:scheme :https :server-name "api.other.com"}))
 
 (defroute countries []
   "/countries" :server example)
@@ -69,6 +78,25 @@
     (assert (= [] (:params route)))
     (assert (= example (:server route)))))
 
+;; LANGUAGES
+
+(defn test-languages-path []
+  (assert (= "/languages" (languages-path))))
+
+(defn test-languages-url []
+  (assert (= "http://api.other.com/languages" (languages-url))))
+
+(defn test-languages-route []
+  (let [route (route :languages)]
+    (assert (= route (languages-route)))
+    (assert (instance? routes.helper.Route route))
+    (assert (= "/languages" (:pattern route)))
+    (assert (= [] (:args route)))
+    (assert (= :languages (:name route)))
+    (assert (= [] (:params route)))
+    (assert (= (parse-server "http://api.other.com")
+               (:server route)))))
+
 (defn test []
   (test-continents-path)
   (test-continents-url)
@@ -78,4 +106,7 @@
   (test-continent-route)
   (test-countries-path)
   (test-countries-url)
-  (test-countries-route))
+  (test-countries-route)
+  (test-languages-path)
+  (test-languages-url)
+  (test-languages-route))

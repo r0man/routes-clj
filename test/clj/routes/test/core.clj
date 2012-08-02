@@ -14,7 +14,16 @@
     "/continents")
 
   (defroute continent [continent]
-    "/continents/:iso-3166-1-alpha-2-:name"))
+    "/continents/:iso-3166-1-alpha-2-:name"
+    :server *server*)
+
+  (defroute languages []
+    "/languages"
+    :server "http://api.other.com")
+
+  (defroute language [continent]
+    "/languages/:iso-639-1-:name"
+    :server {:scheme :https :server-name "api.other.com"}))
 
 (defroute countries []
   "/countries" :server example)
@@ -70,3 +79,22 @@
     (is (= :countries (:name route)))
     (is (= [] (:params route)))
     (is (= example (:server route)))))
+
+;; LANGUAGES
+
+(deftest test-languages-path
+  (is (= "/languages" (languages-path))))
+
+(deftest test-languages-url
+  (is (= "http://api.other.com/languages" (languages-url))))
+
+(deftest test-languages-route []
+  (let [route (route :languages)]
+    (is (= route (languages-route)))
+    (is (instance? routes.helper.Route route))
+    (is (= "/languages" (:pattern route)))
+    (is (= [] (:args route)))
+    (is (= :languages (:name route)))
+    (is (= [] (:params route)))
+    (is (= (parse-server "http://api.other.com")
+           (:server route)))))

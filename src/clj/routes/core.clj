@@ -2,7 +2,7 @@
   (:refer-clojure :exclude (replace))
   (:require [clojure.string :refer [upper-case replace]]
             [routes.helper :refer [parse-keys parse-url]]
-            [routes.server :refer [*server*]]))
+            [routes.server :refer [*server* parse-server]]))
 
 (defmacro defroute
   "Define a route."
@@ -12,12 +12,14 @@
        (routes.helper/register
         (routes.helper/map->Route
          (merge
+          ~options
           {:name ~(keyword name#)
            :args (quote ~args#)
            :pattern ~pattern#
            :params ~(parse-keys pattern#)
-           :server routes.server/*server*}
-          ~options)))
+           :server (routes.server/parse-server
+                    (or ~(:server options)
+                        routes.server/*server*))})))
        (defn ^:export ~(symbol (str name# "-route")) []
          (routes.helper/route ~(keyword name#)))
        (defn ^:export ~(symbol (str name# "-path")) [~@args#]
