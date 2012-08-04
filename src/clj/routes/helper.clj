@@ -1,6 +1,6 @@
 (ns routes.helper
   (:refer-clojure :exclude [replace])
-  (:require [clojure.string :refer [blank? join split replace replace-first]]
+  (:require [clojure.string :refer [blank? split replace]]
             [inflections.core :refer [parameterize]]
             [inflections.number :refer [parse-integer]]
             [routes.server :refer [*server* server-url]]))
