@@ -1,6 +1,6 @@
 (ns routes.helper
   (:refer-clojure :exclude [replace])
-  (:require [clojure.string :refer [blank? join lower-case split replace replace-first]]
+  (:require [clojure.string :refer [blank? join split replace replace-first]]
             [inflections.core :refer [parameterize]]
             [inflections.number :refer [parse-integer]]
             [routes.server :refer [*server* server-url]]))
@@ -24,15 +24,6 @@
 (defn register
   "Register `route` by it's name."
   [route] (swap! *routes* assoc (keyword (:name route)) route))
-
-(defn path
-  "Make a path by joining `segments` with a slash."
-  [& segments]
-  (->> (map str segments)
-       (remove blank?)
-       (map #(replace %1 #"^/+" ""))
-       (join "/")
-       (str "/")))
 
 (defn read-vector [s]
   (->> (map #(keyword (replace %1 #"^:" ""))
