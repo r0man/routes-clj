@@ -4,7 +4,11 @@
   (:use-macros [routes.core :only [defroute with-server]]))
 
 (def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
+
 (def spain {:iso-3166-1-alpha-2 "es" :name "Spain"})
+
+(def address-of-mundaka
+  {:location {:latitude 43.4073349 :longitude -2.6983217}})
 
 (with-server example
 
@@ -23,8 +27,22 @@
     "/languages/[:iso-639-1]-[:name]"
     :server {:scheme :https :server-name "api.other.com"}))
 
+(defroute address [address]
+  "/addresses/[:location :latitude],[:location :longitude]"
+  :server example)
+
 (defroute countries []
   "/countries" :server example)
+
+;; ADDRESSES
+
+(defn test-address-path []
+  (assert (= "/addresses/43-4073349,2-6983217"
+             (address-path address-of-mundaka))))
+
+(defn test-address-url []
+  (assert (= "https://example.com/addresses/43-4073349,2-6983217"
+             (address-url address-of-mundaka))))
 
 ;; CONTINENTS
 
@@ -98,6 +116,8 @@
                (:server route)))))
 
 (defn test []
+  (test-address-path)
+  (test-address-url)
   (test-continents-path)
   (test-continents-url)
   (test-continents-route)

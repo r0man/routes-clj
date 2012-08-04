@@ -6,7 +6,11 @@
   (:import routes.helper.Route))
 
 (def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
+
 (def spain {:iso-3166-1-alpha-2 "es" :name "Spain"})
+
+(def address-of-mundaka
+  {:location {:latitude 43.4073349 :longitude -2.6983217}})
 
 (with-server example
 
@@ -25,12 +29,26 @@
     "/languages/[:iso-639-1]-[:name]"
     :server {:scheme :https :server-name "api.other.com"}))
 
+(defroute address [address]
+  "/addresses/[:location :latitude],[:location :longitude]"
+  :server example)
+
 (defroute countries []
   "/countries" :server example)
 
 (defroute country-of-continent [continent country]
   "/continents/[:iso-3166-1-alpha-2]-[:name]/countries/[:iso-3166-1-alpha-2]-[:name]"
   :server example)
+
+;; ADDRESSES
+
+(deftest test-address-path
+  (is (= "/addresses/43-4073349,2-6983217"
+         (address-path address-of-mundaka))))
+
+(deftest test-address-url
+  (is (= "https://example.com/addresses/43-4073349,2-6983217"
+         (address-url address-of-mundaka))))
 
 ;; CONTINENTS
 
