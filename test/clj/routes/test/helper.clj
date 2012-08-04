@@ -1,6 +1,35 @@
 (ns routes.test.helper
   (:use clojure.test
-        routes.helper))
+        routes.helper
+        routes.test.core))
+
+(deftest test-format-path
+  (are [r args expected]
+    (is (= expected (apply format-path r args)))
+    (route :continents) []
+    "/continents"
+    (route :continent) [europe]
+    "/continents/eu-europe"
+    (route :country-of-continent) [europe spain]
+    "/continents/eu-europe/countries/es-spain"))
+
+(deftest test-format-url
+  (are [r args expected]
+    (is (= expected (apply format-url r args)))
+    (route :continents) []
+    "https://example.com/continents"
+    (route :continent) [europe]
+    "https://example.com/continents/eu-europe"
+    (route :country-of-continent) [europe spain]
+    "https://example.com/continents/eu-europe/countries/es-spain"))
+
+(deftest test-read-vector
+  (are [string expected]
+    (is (= expected (read-vector string)))
+    nil []
+    "" []
+    "[:id]" [:id]
+    "[:id :name]" [:id :name]))
 
 (deftest link-to-test
   (is (= (link-to "http://example.com/")
@@ -17,16 +46,6 @@
   (let [example-route {:name :example-route}]
     (register example-route)
     (is (= example-route (route (:name example-route))))))
-
-(deftest test-format-pattern
-  (are [pattern args expected]
-    (is (= expected (apply format-pattern pattern args)))
-    "/continents/:iso-3166-1-alpha-2-:name"
-    [{:iso-3166-1-alpha-2 "eu" :name "Europe"}]
-    "/continents/eu-europe"
-    "/:a/:b-:c/d/:e-f-g"
-    [{:a 1} {:b 2 :c 3} {:e-f-g 4}]
-    "/1/2-3/d/4"))
 
 (deftest test-identifier
   (are [test expected]
@@ -67,21 +86,35 @@
 (deftest test-parse-keys
   (are [pattern expected]
     (is (= expected (parse-keys pattern)))
-    "/continents/:iso-3166-1-alpha-2-:name"
-    [[:iso-3166-1-alpha-2 :name]]
-    "/continents/:iso-3166-1-alpha-2-:name"
-    [[:iso-3166-1-alpha-2 :name]]
-    "/:a/:b-:c/d/:e-f-g"
-    [[:a] [:b :c] [:e-f-g]]))
+    "/continents/[:iso-3166-1-alpha-2]-[:name]"
+    [[[:iso-3166-1-alpha-2] [:name]]]
+    "/addresses/[:location :latitude],[:location :longitude]"
+    [[[:location :latitude] [:location :longitude]]]))
+
+(deftest test-parse-pattern
+  (are [pattern expected]
+    (is (= expected (parse-pattern pattern)))
+    nil
+    ""
+    ""
+    ""
+    "/continents"
+    "/continents"
+    "/continents/[:iso-3166-1-alpha-2]-[:name]"
+    "/continents/%s-%s"
+    "/addresses/[:location :latitude],[:location :longitude]"
+    "/addresses/%s,%s"))
 
 (deftest test-parse-url
-  (is (nil? (parse-url nil)))
-  (is (nil? (parse-url "")))
-  (is (= {:scheme :https :server-name "example.com" :server-port 443 :uri "/"}
-         (parse-url "example.com")))
-  (is (= {:scheme :https :server-name "example.com" :server-port 81 :uri "/"}
-         (parse-url "example.com:81")))
-  (is (= {:scheme :http :server-name "example.com" :server-port 81 :uri "/continents"}
-         (parse-url "http://example.com:81/continents")))
-  (let [url "http://example.com/continents"]
-    (is (= (parse-url url) (parse-url (parse-url url))))))
+  (are [url expected]
+    (is (= expected (parse-url url)))
+    nil nil
+    "" nil
+    "example.com"
+    {:scheme :https :server-name "example.com" :server-port 443 :uri "/"}
+    "example.com:81"
+    {:scheme :https :server-name "example.com" :server-port 81 :uri "/"}
+    "http://example.com:81/continents"
+    {:scheme :http :server-name "example.com" :server-port 81 :uri "/continents"}
+    (parse-url "http://example.com:81/continents")
+    {:scheme :http :server-name "example.com" :server-port 81 :uri "/continents"}))

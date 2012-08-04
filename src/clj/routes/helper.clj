@@ -1,8 +1,9 @@
 (ns routes.helper
-  (:refer-clojure :exclude (replace))
+  (:refer-clojure :exclude [replace])
   (:require [clojure.string :refer [blank? join lower-case split replace replace-first]]
             [inflections.core :refer [parameterize]]
-            [inflections.number :refer [parse-integer]]))
+            [inflections.number :refer [parse-integer]]
+            [routes.server :refer [*server* server-url]]))
 
 (def ^:dynamic *routes* (atom {}))
 
@@ -41,16 +42,19 @@
        (join "/")
        (str "/")))
 
+(defn read-vector [s]
+  (->> (map #(keyword (replace %1 #"^:" ""))
+            (remove blank? (split (replace (str s) #"\[|\]" "") #"\s+")))
+       (apply vector)))
+
 (defn parse-keys [pattern]
   (->> (split pattern #"/")
-       (map (fn [segment]
-              (->> (re-seq #"\:[^:]+" segment)
-                   (map #(replace %1 ":" ""))
-                   (map #(replace %1 #"-$" ""))
-                   (map keyword)
-                   (apply vector))))
+       (map #(apply vector (map read-vector (re-seq #"\[[^]]+\]" %1))))
        (remove empty?)
        (apply vector)))
+
+(defn parse-pattern [pattern]
+  (replace (str pattern) #"\[[^]]+\]" "%s"))
 
 (defn parse-url [url]
   (cond
@@ -67,11 +71,13 @@
                       (= :https scheme) 443)
         :uri (or (nth matches 6) "/")}))))
 
-(defn format-pattern [pattern & args]
-  (reduce
-   (fn [pattern [keyseq arg]]
-     (reduce #(replace-first
-               %1 (str %2)
-               (parameterize (lower-case (str (get arg %2)))))
-             pattern keyseq))
-   pattern (map vector (parse-keys pattern) args)))
+(defn format-path [route & args]
+  (apply format (:pattern route)
+         (mapcat
+          (fn [[m args]]
+            (map lower-case (map #(get-in m %1) args)))
+          (map vector args (:params route)))))
+
+(defn format-url [route & args]
+  (str (server-url (or *server* (:server route)))
+       (apply format-path route args)))

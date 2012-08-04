@@ -1,5 +1,4 @@
-(ns routes.server
-  (:require [routes.helper :refer [parse-url]]))
+(ns routes.server)
 
 (def ^:dynamic *server* nil)
 

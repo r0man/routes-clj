@@ -12,7 +12,7 @@
     "/continents")
 
   (defroute continent [continent]
-    "/continents/:iso-3166-1-alpha-2-:name"
+    "/continents/[:iso-3166-1-alpha-2]-[:name]"
     :server *server*)
 
   (defroute languages []
@@ -20,7 +20,7 @@
     :server "http://api.other.com")
 
   (defroute language [continent]
-    "/languages/:iso-639-1-:name"
+    "/languages/[:iso-639-1]-[:name]"
     :server {:scheme :https :server-name "api.other.com"}))
 
 (defroute countries []
@@ -54,10 +54,10 @@
   (let [route (route :continent)]
     (assert (= route (continent-route)))
     (assert (instance? routes.helper.Route route))
-    (assert (= "/continents/:iso-3166-1-alpha-2-:name" (:pattern route)))
+    (assert (= "/continents/%s-%s" (:pattern route)))
     (assert (= ['continent] (:args route)))
     (assert (= :continent (:name route)))
-    (assert (= [[:iso-3166-1-alpha-2 :name]] (:params route)))
+    (assert (= [[[:iso-3166-1-alpha-2] [:name]]] (:params route)))
     (assert (= {:scheme :https :server-name "example.com" :server-port 443} (:server route)))))
 
 ;; COUNTRIES
