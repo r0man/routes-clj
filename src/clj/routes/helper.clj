@@ -75,7 +75,7 @@
   (apply format (:pattern route)
          (mapcat
           (fn [[m args]]
-            (map lower-case (map #(get-in m %1) args)))
+            (map parameterize (map #(get-in m %1) args)))
           (map vector args (:params route)))))
 
 (defn format-url [route & args]
