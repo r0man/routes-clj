@@ -25,14 +25,6 @@
   "Register `route` by it's name."
   [route] (swap! *routes* assoc (keyword (:name route)) route))
 
-(defn identifier [resource keyseq]
-  (->> (map resource keyseq)
-       (map str)
-       (remove blank?)
-       (map lower-case)
-       (map parameterize)
-       (join "-")))
-
 (defn path
   "Make a path by joining `segments` with a slash."
   [& segments]

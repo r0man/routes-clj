@@ -47,28 +47,6 @@
     (register example-route)
     (is (= example-route (route (:name example-route))))))
 
-(deftest test-identifier
-  (are [test expected]
-    (is (= expected test))
-    (identifier
-     {:iso-3166-1-alpha-2 "eu"}
-     [:iso-3166-1-alpha-2 :name])
-    "eu"
-    (identifier
-     {:iso-3166-1-alpha-2 "eu"
-      :name "Europe"}
-     [:iso-3166-1-alpha-2 :name])
-    "eu-europe"
-    (identifier
-     {:iso-3166-1-alpha-2 "na"
-      :name "North America"}
-     [:iso-3166-1-alpha-2 :name])
-    "na-north-america"
-    (identifier
-     {:id 1 :name "Northern California"}
-     [:id :name])
-    "1-northern-california"))
-
 (deftest test-path
   (are [segments expected]
     (is (= expected (apply path segments)))
