@@ -1,6 +1,6 @@
 (ns routes.test.core
-  (:use [routes.helper :only [route]]
-        [routes.server :only [example parse-server]])
+  (:use [routes.helper :only [route parse-url]]
+        [routes.server :only [example *server*]])
   (:use-macros [routes.core :only [defroute with-server]]))
 
 (def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
@@ -94,7 +94,7 @@
     (assert (= [] (:args route)))
     (assert (= :languages (:name route)))
     (assert (= [] (:params route)))
-    (assert (= (parse-server "http://api.other.com")
+    (assert (= (parse-url "http://api.other.com")
                (:server route)))))
 
 (defn test []

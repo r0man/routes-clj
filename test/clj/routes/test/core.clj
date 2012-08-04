@@ -96,5 +96,5 @@
     (is (= [] (:args route)))
     (is (= :languages (:name route)))
     (is (= [] (:params route)))
-    (is (= (parse-server "http://api.other.com")
+    (is (= (parse-url "http://api.other.com")
            (:server route)))))

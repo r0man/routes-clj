@@ -53,11 +53,19 @@
        (apply vector)))
 
 (defn parse-url [url]
-  (if-let [matches (re-find #"(([^:]+)://)?([^:/]+)(:(\d+))?(/.*)?" url)]
-    {:scheme (keyword (or (nth matches 2) :https))
-     :server-name (nth matches 3)
-     :server-port (parse-integer (nth matches 5 nil))
-     :uri (nth matches 6)}))
+  (cond
+   (map? url) url
+   (string? url)
+   (if-let [matches (re-find #"(([^:]+)://)?([^:/]+)(:(\d+))?(/.*)?" url)]
+     (let [scheme (keyword (or (nth matches 2) :https))
+           port (parse-integer (nth matches 5))]
+       {:scheme scheme
+        :server-name (nth matches 3)
+        :server-port (cond
+                      (integer? port) port
+                      (= :http scheme) 80
+                      (= :https scheme) 443)
+        :uri (or (nth matches 6) "/")}))))
 
 (defn format-pattern [pattern & args]
   (reduce

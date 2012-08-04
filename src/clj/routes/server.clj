@@ -10,13 +10,6 @@
 (def example
   {:scheme :https :server-name "example.com"})
 
-(defn parse-server [server]
-  (cond
-   (string? server)
-   (parse-url server)
-   (and (map? server) (:server-name server))
-   server))
-
 (defn server-url
   "Returns the url of `server`."
   [server]

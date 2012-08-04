@@ -75,11 +75,13 @@
     [[:a] [:b :c] [:e-f-g]]))
 
 (deftest test-parse-url
-  (are [url expected]
-    (is (= expected (parse-url url)))
-    "api.burningswell.com"
-    {:scheme :https :server-name "api.burningswell.com" :server-port nil :uri nil}
-    "api.burningswell.com:80"
-    {:scheme :https :server-name "api.burningswell.com" :server-port 80 :uri nil}
-    "http://api.burningswell.com:81/base"
-    {:scheme :http :server-name "api.burningswell.com" :server-port 81 :uri "/base"}))
+  (is (nil? (parse-url nil)))
+  (is (nil? (parse-url "")))
+  (is (= {:scheme :https :server-name "example.com" :server-port 443 :uri "/"}
+         (parse-url "example.com")))
+  (is (= {:scheme :https :server-name "example.com" :server-port 81 :uri "/"}
+         (parse-url "example.com:81")))
+  (is (= {:scheme :http :server-name "example.com" :server-port 81 :uri "/continents"}
+         (parse-url "http://example.com:81/continents")))
+  (let [url "http://example.com/continents"]
+    (is (= (parse-url url) (parse-url (parse-url url))))))

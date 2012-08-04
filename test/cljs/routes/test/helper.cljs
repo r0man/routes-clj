@@ -18,12 +18,16 @@
     (assert (= example (route (:name example))))))
 
 (defn test-parse-url []
-  (assert (= {:scheme :https :server-name "api.burningswell.com" :server-port nil :uri nil}
-             (parse-url "api.burningswell.com")))
-  (assert (= {:scheme :https :server-name "api.burningswell.com" :server-port 80 :uri nil}
-             (parse-url "api.burningswell.com:80")))
-  (assert (= {:scheme :http :server-name "api.burningswell.com" :server-port 81 :uri "/base"}
-             (parse-url "http://api.burningswell.com:81/base"))))
+  (assert (nil? (parse-url nil)))
+  (assert (nil? (parse-url "")))
+  (assert (= {:scheme :https :server-name "example.com" :server-port 443 :uri "/"}
+             (parse-url "example.com")))
+  (assert (= {:scheme :https :server-name "example.com" :server-port 81 :uri "/"}
+             (parse-url "example.com:81")))
+  (assert (= {:scheme :http :server-name "example.com" :server-port 81 :uri "/continents"}
+             (parse-url "http://example.com:81/continents")))
+  (let [url "http://example.com/continents"]
+    (assert (= (parse-url url) (parse-url (parse-url url))))))
 
 (defn test []
   (test-link-to)

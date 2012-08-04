@@ -2,7 +2,7 @@
   (:refer-clojure :exclude (replace))
   (:require [clojure.string :refer [upper-case replace]]
             [routes.helper :refer [parse-keys parse-url]]
-            [routes.server :refer [*server* parse-server]]))
+            [routes.server :refer [*server*]]))
 
 (defmacro defroute
   "Define a route."
@@ -17,7 +17,7 @@
            :args (quote ~args#)
            :pattern ~pattern#
            :params ~(parse-keys pattern#)
-           :server (routes.server/parse-server
+           :server (routes.helper/parse-url
                     (or ~(:server options)
                         routes.server/*server*))})))
        (defn ^:export ~(symbol (str name# "-route")) []
@@ -32,5 +32,5 @@
 
 (defmacro with-server [server & body]
   "Evaluate `body` with *server* bound to `server`."
-  `(binding [routes.server/*server* (routes.server/parse-server ~server)]
+  `(binding [routes.server/*server* (routes.helper/parse-url ~server)]
      ~@body))
