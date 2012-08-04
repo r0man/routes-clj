@@ -31,7 +31,8 @@
 
 (defroute address [address]
   "/addresses/[:location :latitude],[:location :longitude]"
-  :server example)
+  :server example
+  :parameterize str)
 
 (defroute countries []
   "/countries" :server example)
@@ -43,11 +44,11 @@
 ;; ADDRESSES
 
 (deftest test-address-path
-  (is (= "/addresses/43-4073349,2-6983217"
+  (is (= "/addresses/43.4073349,-2.6983217"
          (address-path address-of-mundaka))))
 
 (deftest test-address-url
-  (is (= "https://example.com/addresses/43-4073349,2-6983217"
+  (is (= "https://example.com/addresses/43.4073349,-2.6983217"
          (address-url address-of-mundaka))))
 
 ;; CONTINENTS

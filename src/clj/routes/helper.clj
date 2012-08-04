@@ -55,11 +55,12 @@
         :uri (or (nth matches 6) "/")}))))
 
 (defn format-path [route & args]
-  (apply format (:pattern route)
-         (mapcat
-          (fn [[m args]]
-            (map (comp parameterize str) (map #(get-in m %1) args)))
-          (map vector args (:params route)))))
+  (let [parameterize (or (:parameterize route) parameterize)]
+    (apply format (:pattern route)
+           (mapcat
+            (fn [[m args]]
+              (map (comp parameterize str) (map #(get-in m %1) args)))
+            (map vector args (:params route))))))
 
 (defn format-url [route & args]
   (str (server-url (or *server* (:server route)))
