@@ -58,7 +58,7 @@
     (assert (= ['continent] (:args route)))
     (assert (= :continent (:name route)))
     (assert (= [[:iso-3166-1-alpha-2 :name]] (:params route)))
-    (assert (= {:scheme :https, :server-name "example.com"} (:server route)))))
+    (assert (= {:scheme :https :server-name "example.com" :server-port 443} (:server route)))))
 
 ;; COUNTRIES
 

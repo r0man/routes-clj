@@ -60,7 +60,7 @@
     (is (= ['continent] (:args route)))
     (is (= :continent (:name route)))
     (is (= [[:iso-3166-1-alpha-2 :name]] (:params route)))
-    (is (= {:scheme :https, :server-name "example.com"} (:server route)))))
+    (is (= {:scheme :https, :server-name "example.com" :server-port 443} (:server route)))))
 
 ;; COUNTRIES
 

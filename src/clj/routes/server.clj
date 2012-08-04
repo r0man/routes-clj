@@ -8,7 +8,7 @@
    :https 443})
 
 (def example
-  {:scheme :https :server-name "example.com"})
+  {:scheme :https :server-name "example.com" :server-port 443})
 
 (defn server-url
   "Returns the url of `server`."
@@ -19,6 +19,7 @@
    (and (map? server) (:server-name server))
    (let [{:keys [scheme server-name server-port]} server]
      (str (name (or scheme :https)) "://" server-name
+          (cond )
           (if (and server-port (not (= server-port (get *ports* scheme))))
             (str ":" server-port))))))
 
