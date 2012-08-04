@@ -1,7 +1,5 @@
 (ns routes.core
-  (:refer-clojure :exclude (replace))
-  (:require [clojure.string :refer [upper-case replace]]
-            [routes.helper :refer [parse-keys parse-pattern parse-url]]
+  (:require [routes.helper :refer [parse-keys parse-pattern]]
             [routes.server :refer [*server*]]))
 
 (defmacro defroute
@@ -17,9 +15,7 @@
            :args (quote ~args#)
            :pattern ~(parse-pattern pattern#)
            :params ~(parse-keys pattern#)
-           :server (routes.helper/parse-url
-                    (or ~(:server options)
-                        routes.server/*server*))})))
+           :server (routes.helper/parse-url (or ~(:server options) routes.server/*server*))})))
        (defn ^:export ~(symbol (str name# "-route")) []
          (routes.helper/route ~(keyword name#)))
        (defn ^:export ~(symbol (str name# "-path")) [~@args#]
