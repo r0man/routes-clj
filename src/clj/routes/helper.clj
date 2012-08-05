@@ -1,13 +1,13 @@
 (ns routes.helper
   (:refer-clojure :exclude [replace])
-  (:require [clojure.string :refer [blank? split replace]]
+  (:require [clojure.string :refer [blank? join split replace]]
             [inflections.core :refer [parameterize]]
             [inflections.number :refer [parse-integer]]
             [routes.server :refer [*server* server-url]]))
 
 (def ^:dynamic *routes* (atom {}))
 
-(defrecord Route [name args pattern params])
+(defrecord Route [name args pattern params root])
 
 (defn link-to
   "Wraps some content in a HTML hyperlink with the supplied URL."
@@ -65,3 +65,14 @@
 (defn format-url [route & args]
   (str (server-url (or *server* (:server route)))
        (apply format-path route args)))
+
+(defn path
+  "Make a path by joining `segments` with a slash."
+  [& segments]
+  (->> (map str segments)
+       (remove blank?)
+       (map #(replace %1 #"^/+" ""))
+       (map #(replace %1 #"/+$" ""))
+       (remove blank?)
+       (join "/")
+       (str "/")))

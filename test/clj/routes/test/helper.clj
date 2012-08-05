@@ -47,6 +47,20 @@
     (register example-route)
     (is (= example-route (route (:name example-route))))))
 
+(deftest test-path
+  (are [segments expected]
+    (is (= expected (apply path segments)))
+    ["/"]
+    "/"
+    ["continents"]
+    "/continents"
+    ["/" "/continents"]
+    "/continents"
+    ["continents" "eu-europe"]
+    "/continents/eu-europe"
+    ["/continents" "/eu-europe"]
+    "/continents/eu-europe"))
+
 (deftest test-parse-keys
   (are [pattern expected]
     (is (= expected (parse-keys pattern)))
