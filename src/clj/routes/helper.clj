@@ -7,7 +7,11 @@
 
 (def ^:dynamic *routes* (atom {}))
 
-(defrecord Route [name args pattern params root])
+(defprotocol IRoute
+  (-format [route args] "Format the `route`.")
+  (-parse [route s] "Parse the `route`."))
+
+(defrecord Route [name args route-pattern route-params root])
 
 (defn link-to
   "Wraps some content in a HTML hyperlink with the supplied URL."
@@ -32,12 +36,35 @@
 
 (defn parse-keys [pattern]
   (->> (split pattern #"/")
-       (map #(apply vector (map read-vector (re-seq #"\[[^]]+\]" %1))))
+       (map (fn [segment]
+              (->> (re-seq #"\:[^:]+" segment)
+                   (map #(replace %1 ":" ""))
+                   (map #(replace %1 #"-$" ""))
+                   (map keyword)
+                   (apply vector))))
        (remove empty?)
        (apply vector)))
 
+(defn split-by [coll counts]
+  (-> (reduce
+       (fn [[coll skip groups] count]
+         [(drop skip coll) count (conj groups (take count coll))])
+       [coll 0 []] counts)
+      (last)))
+
+(defn make-params [pattern & bindings]
+  (let [keys (parse-keys pattern)]
+    (assert (= (count (flatten keys)) (count bindings)))
+    (->> (map
+          (fn [keys params] (map #(assoc %2 :name (name %1)) keys params))
+          keys (split-by bindings (map count keys)))
+         (apply vector))))
+
 (defn parse-pattern [pattern]
-  (replace (str pattern) #"\[[^]]+\]" "%s"))
+  (replace
+   (str pattern)
+   #"\:[^:]+"
+   #(str "%s" (if (= \- (last %1)) "-"))))
 
 (defn parse-url [url]
   (cond
@@ -55,12 +82,11 @@
         :uri (or (nth matches 6) "/")}))))
 
 (defn format-path [route & args]
-  (let [parameterize (or (:parameterize route) parameterize)]
-    (apply format (:pattern route)
-           (mapcat
-            (fn [[m args]]
-              (map (comp parameterize str) (map #(get-in m %1) args)))
-            (map vector args (:params route))))))
+  (->> (map (fn [arg params]
+              (map #((:format-fn %1) (get arg (keyword (:name %1)))) params))
+            args (:params route))
+       (flatten)
+       (apply format (:pattern route))))
 
 (defn format-url [route & args]
   (str (server-url (or *server* (:server route)))

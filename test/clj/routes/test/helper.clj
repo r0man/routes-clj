@@ -1,27 +1,27 @@
 (ns routes.test.helper
   (:use clojure.test
         routes.helper
-        routes.test.core))
+        routes.test.fixtures))
 
 (deftest test-format-path
   (are [r args expected]
     (is (= expected (apply format-path r args)))
-    (route :continents) []
+    continents-route []
     "/continents"
-    (route :continent) [europe]
-    "/continents/eu-europe"
-    (route :country-of-continent) [europe spain]
-    "/continents/eu-europe/countries/es-spain"))
+    continent-route [europe]
+    "/continents/1-europe"
+    country-of-continent-route [europe spain]
+    "/continents/1-europe/countries/es-spain"))
 
 (deftest test-format-url
   (are [r args expected]
     (is (= expected (apply format-url r args)))
-    (route :continents) []
+    continents-route []
     "https://example.com/continents"
-    (route :continent) [europe]
-    "https://example.com/continents/eu-europe"
-    (route :country-of-continent) [europe spain]
-    "https://example.com/continents/eu-europe/countries/es-spain"))
+    continent-route [europe]
+    "https://example.com/continents/1-europe"
+    country-of-continent-route [europe spain]
+    "https://example.com/continents/1-europe/countries/es-spain"))
 
 (deftest test-read-vector
   (are [string expected]
@@ -56,18 +56,20 @@
     "/continents"
     ["/" "/continents"]
     "/continents"
-    ["continents" "eu-europe"]
-    "/continents/eu-europe"
-    ["/continents" "/eu-europe"]
-    "/continents/eu-europe"))
+    ["continents" "1-europe"]
+    "/continents/1-europe"
+    ["/continents" "/1-europe"]
+    "/continents/1-europe"))
 
 (deftest test-parse-keys
   (are [pattern expected]
     (is (= expected (parse-keys pattern)))
-    "/continents/[:iso-3166-1-alpha-2]-[:name]"
-    [[[:iso-3166-1-alpha-2] [:name]]]
-    "/addresses/[:location :latitude],[:location :longitude]"
-    [[[:location :latitude] [:location :longitude]]]))
+    "/continents/:iso-3166-1-alpha-2-:name"
+    [[:iso-3166-1-alpha-2 :name]]
+    "/continents/:iso-3166-1-alpha-2-:name/countries/:iso-3166-1-alpha-2-:name"
+    [[:iso-3166-1-alpha-2 :name] [:iso-3166-1-alpha-2 :name]]
+    "/addresses/:location"
+    [[:location]]))
 
 (deftest test-parse-pattern
   (are [pattern expected]
@@ -78,10 +80,10 @@
     ""
     "/continents"
     "/continents"
-    "/continents/[:iso-3166-1-alpha-2]-[:name]"
+    "/continents/:iso-3166-1-alpha-2-:name"
     "/continents/%s-%s"
-    "/addresses/[:location :latitude],[:location :longitude]"
-    "/addresses/%s,%s"))
+    "/addresses/:location"
+    "/addresses/%s"))
 
 (deftest test-parse-url
   (are [url expected]

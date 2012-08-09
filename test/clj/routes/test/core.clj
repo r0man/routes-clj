@@ -1,47 +1,59 @@
 (ns routes.test.core
+  (:require [routes.param :as params])
   (:use clojure.test
         routes.core
         routes.helper
-        routes.server)
+        routes.server
+        routes.test.fixtures)
   (:import routes.helper.Route))
 
-(def europe {:iso-3166-1-alpha-2 "eu" :name "Europe"})
+;; ROOT
 
-(def spain {:iso-3166-1-alpha-2 "es" :name "Spain"})
+(deftest test-root-route
+  (let [route root-route]
+    (is (instance? routes.helper.Route route))
+    (is (= [] (:args route)))
+    (is (= "root" (:name route)))
+    (is (= [] (:params route)))
+    (is (= "/" (:pattern route)))
+    (is (nil? (:root route)))
+    (is (= example (:server route)))))
 
-(def address-of-mundaka
-  {:location {:latitude 43.4073349 :longitude -2.6983217}})
+(deftest test-root-path
+  (is (= "/" (root-path))))
 
-(with-server example
-
-  (defroute continents []
-    "/continents")
-
-  (defroute continent [continent]
-    "/continents/[:iso-3166-1-alpha-2]-[:name]"
-    :server *server*)
-
-  (defroute languages []
-    "/languages"
-    :server "http://api.other.com")
-
-  (defroute language [continent]
-    "/languages/[:iso-639-1]-[:name]"
-    :server {:scheme :https :server-name "api.other.com"}))
-
-(defroute address [address]
-  "/addresses/[:location :latitude],[:location :longitude]"
-  :server example
-  :parameterize str)
-
-(defroute countries []
-  "/countries" :server example)
-
-(defroute country-of-continent [continent country]
-  "/continents/[:iso-3166-1-alpha-2]-[:name]/countries/[:iso-3166-1-alpha-2]-[:name]"
-  :server example)
+(deftest test-root-url
+  (is (= "https://example.com/" (root-url))))
 
 ;; ADDRESSES
+
+(deftest test-addresses-route
+  (let [route addresses-route]
+    (is (instance? routes.helper.Route route))
+    (is (= [] (:args route)))
+    (is (= "addresses" (:name route)))
+    (is (= [] (:params route)))
+    (is (= "/addresses" (:pattern route)))
+    (is (= root-route (:root route)))
+    (is (= example (:server route)))))
+
+(deftest test-addresses-path
+  (is (= "/addresses" (addresses-path))))
+
+(deftest test-addresses-url
+  (is (= "https://example.com/addresses" (addresses-url))))
+
+;; ADDRESS
+
+(deftest test-address-route
+  (let [route address-route]
+    (is (instance? routes.helper.Route route))
+    (is (= '[address] (:args route)))
+    (is (= "address" (:name route)))
+    (is (= [[(assoc params/location :name "location")]] (:params route)))
+    (is (= "/addresses/%s" (:pattern route)))
+    (is (= addresses-route (:root route)))
+    (is (= example (:server route)))))
 
 (deftest test-address-path
   (is (= "/addresses/43.4073349,-2.6983217"
@@ -51,7 +63,17 @@
   (is (= "https://example.com/addresses/43.4073349,-2.6983217"
          (address-url address-of-mundaka))))
 
-;; CONTINENTS
+;; ;; CONTINENTS
+
+(deftest test-continents-route
+  (let [route continents-route]
+    (is (instance? routes.helper.Route route))
+    (is (= [] (:args route)))
+    (is (= "continents" (:name route)))
+    (is (= [] (:params route)))
+    (is (= "/continents" (:pattern route)))
+    (is (= root-route (:root route)))
+    (is (= example (:server route)))))
 
 (deftest test-continents-path
   (is (= "/continents" (continents-path))))
@@ -59,31 +81,25 @@
 (deftest test-continents-url
   (is (= "https://example.com/continents" (continents-url))))
 
-(deftest test-continents-route []
-  (let [route (route :continents)]
-    (is (= route (continents-route)))
-    (is (instance? routes.helper.Route route))
-    (is (= "/continents" (:pattern route)))
-    (is (= [] (:args route)))
-    (is (= :continents (:name route)))
-    (is (= [] (:params route)))
-    (is (= example (:server route)))))
+;; CONTINENT
 
 (deftest test-continent-path
-  (is (= "/continents/eu-europe" (continent-path europe))))
+  (is (= "/continents/1-europe" (continent-path europe))))
 
 (deftest test-continent-url
-  (is (= "https://example.com/continents/eu-europe" (continent-url europe))) )
+  (is (= "https://example.com/continents/1-europe" (continent-url europe))) )
 
 (deftest test-continent-route
-  (let [route (route :continent)]
-    (is (= route (continent-route)))
+  (let [route continent-route]
     (is (instance? routes.helper.Route route))
-    (is (= "/continents/%s-%s" (:pattern route)))
     (is (= ['continent] (:args route)))
-    (is (= :continent (:name route)))
-    (is (= [[[:iso-3166-1-alpha-2] [:name]]] (:params route)))
-    (is (= {:scheme :https, :server-name "example.com" :server-port 443} (:server route)))))
+    (is (= "continent" (:name route)))
+    (is (= [[(assoc params/integer :name "id")
+             (assoc params/string :name "name")]]
+           (:params route)))
+    (is (= "/continents/%s-%s" (:pattern route)))
+    (is (= continents-route (:root route)))
+    (is (= example (:server route)))))
 
 ;; COUNTRIES
 
@@ -94,30 +110,55 @@
   (is (= "https://example.com/countries" (countries-url))))
 
 (deftest test-countries-route
-  (let [route (route :countries)]
-    (is (= route (countries-route)))
+  (let [route countries-route]
     (is (instance? routes.helper.Route route))
-    (is (= "/countries" (:pattern route)))
     (is (= [] (:args route)))
-    (is (= :countries (:name route)))
+    (is (= "countries" (:name route)))
     (is (= [] (:params route)))
+    (is (= "/countries" (:pattern route)))
+    (is (= root-route (:root route)))
     (is (= example (:server route)))))
 
-;; LANGUAGES
+(deftest test-countries-path
+  (is (= "/countries" (countries-path))))
 
-(deftest test-languages-path
-  (is (= "/languages" (languages-path))))
+(deftest test-countries-url
+  (is (= "https://example.com/countries" (countries-url))))
 
-(deftest test-languages-url
-  (is (= "http://api.other.com/languages" (languages-url))))
+;; COUNTRIES OF CONTINENT
 
-(deftest test-languages-route []
-  (let [route (route :languages)]
-    (is (= route (languages-route)))
+(deftest test-countries-of-continent-route
+  (let [route countries-of-continent-route]
     (is (instance? routes.helper.Route route))
-    (is (= "/languages" (:pattern route)))
-    (is (= [] (:args route)))
-    (is (= :languages (:name route)))
-    (is (= [] (:params route)))
-    (is (= (parse-url "http://api.other.com")
-           (:server route)))))
+    (is (= '[continent] (:args route)))
+    (is (= "countries-of-continent" (:name route)))
+    (is (= [[(assoc params/integer :name "id")
+             (assoc params/string :name "name")]]
+           (:params route)))
+    (is (= "/continents/%s-%s/countries" (:pattern route)))
+    (is (= continent-route (:root route)))
+    (is (= example (:server route)))))
+
+;; COUNTRY OF CONTINENT
+
+(deftest test-country-of-continent-route
+  (let [route country-of-continent-route]
+    (is (instance? routes.helper.Route route))
+    (is (= '[continent country] (:args route)))
+    (is (= "country-of-continent" (:name route)))
+    (is (= [[(assoc params/integer :name "id")
+             (assoc params/string :name "name")]
+            [(assoc params/iso-3166-1-alpha-2 :name "iso-3166-1-alpha-2")
+             (assoc params/string :name "name")]]
+           (:params route)))
+    (is (= "/continents/%s-%s/countries/%s-%s" (:pattern route)))
+    (is (= countries-of-continent-route (:root route)))
+    (is (= example (:server route)))))
+
+(deftest test-country-of-continent-path
+  (is (= "/continents/1-europe/countries/es-spain"
+         (country-of-continent-path europe spain))))
+
+(deftest test-country-of-continent-url
+  (is (= "https://example.com/continents/1-europe/countries/es-spain"
+         (country-of-continent-url europe spain))))
