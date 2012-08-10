@@ -1,6 +1,6 @@
 (ns routes.test.param
   (:require [clojure.test :refer :all]
-            [routes.param :refer :all]))
+            [routes.params :refer :all]))
 
 (deftest test-format-integer
   (is (= "1" (-format integer 1))))

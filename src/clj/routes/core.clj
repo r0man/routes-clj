@@ -32,7 +32,7 @@
 (defmacro defparam [name doc & [format-fn parse-fn]]
   (let [name# name]
     `(def ~name#
-       (routes.param/->Parameter
+       (routes.params/->Parameter
         ~(str name#)
         ~doc
         (or ~format-fn str)

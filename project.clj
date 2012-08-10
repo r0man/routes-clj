@@ -10,7 +10,7 @@
   :plugins [[lein-cljsbuild "0.2.4"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
-                                   :optimizations :advanced
+                                   :optimizations :whitespace
                                    :pretty-print true}
                         :source-path "test/cljs"}
                        {:compiler {:output-to "target/routes-debug.js"
@@ -24,7 +24,9 @@
                         :jar true}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
-              :crossovers [routes.helper routes.server]
+              :crossovers [routes.helper
+                           routes.params
+                           routes.server]
               :repl-listen-port 9000
               :repl-launch-commands
               {"chromium" ["chromium" "http://localhost:9000/"]

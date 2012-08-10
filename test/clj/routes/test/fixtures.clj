@@ -1,6 +1,6 @@
 (ns routes.test.fixtures
   (:require [routes.core :refer [defroute]]
-            [routes.param :as params]
+            [routes.params :as params]
             [routes.server :refer [example]]))
 
 (def europe {:id 1 :name "Europe"})

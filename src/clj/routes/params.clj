@@ -1,4 +1,4 @@
-(ns routes.param
+(ns routes.params
   (:refer-clojure :exclude [format])
   (:require;*CLJSBUILD-REMOVE*;-macros
    [routes.core :refer [defparam]])

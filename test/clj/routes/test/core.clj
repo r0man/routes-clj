@@ -1,5 +1,5 @@
 (ns routes.test.core
-  (:require [routes.param :as params])
+  (:require [routes.params :as params])
   (:use clojure.test
         routes.core
         routes.helper
