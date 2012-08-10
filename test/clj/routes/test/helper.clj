@@ -45,7 +45,7 @@
 (deftest test-register
   (let [example-route {:name :example-route}]
     (register example-route)
-    (is (= example-route (route (:name example-route))))))
+    (is (= example-route (route (str (:ns example-route) "/" (:name example-route)))))))
 
 (deftest test-path
   (are [segments expected]

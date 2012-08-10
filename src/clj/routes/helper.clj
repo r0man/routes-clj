@@ -27,7 +27,7 @@
 
 (defn register
   "Register `route` by it's name."
-  [route] (swap! *routes* assoc (keyword (:name route)) route))
+  [route] (swap! *routes* assoc (keyword (str (:ns route) "/" (:name route))) route))
 
 (defn read-vector [s]
   (->> (map #(keyword (replace %1 #"^:" ""))
