@@ -9,9 +9,10 @@
         args# args
         pattern# pattern
         options# options
-        root# (:root options)]
+        root# (:root options)
+        symbol# (symbol (str name# "-route"))]
     `(do
-       (def ^:export ~(symbol (str name# "-route"))
+       (def ^:export ~symbol#
          (routes.helper/map->Route
           {:args (concat (:args ~root#) (quote ~args#))
            :name ~(str name#)
@@ -20,19 +21,13 @@
            :pattern (path (:pattern ~root#) ~(parse-pattern (first pattern#)))
            :root ~root#
            :server (or *server* ~(:server options#) (:server ~root#))}))
-       (routes.helper/register ~(symbol (str name# "-route")))
+       (routes.helper/register ~symbol#)
        ;; TODO: Fixed args
        (defn ^:export ~(symbol (str name# "-path")) [& ~'args]
-         (apply
-          routes.helper/format-path
-          ~(symbol (str name# "-route"))
-          ~'args))
+         (apply routes.helper/format-path ~symbol# ~'args))
        ;; TODO: Fixed args
        (defn ^:export ~(symbol (str name# "-url")) [& ~'args]
-         (apply
-          routes.helper/format-url
-          ~(symbol (str name# "-route"))
-          ~'args)))))
+         (apply routes.helper/format-url ~symbol# ~'args)))))
 
 (defmacro defparam [name doc & [format-fn parse-fn]]
   (let [name# name]
