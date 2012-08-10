@@ -1,4 +1,4 @@
-(ns routes.test.param
+(ns routes.test.params
   (:require [clojure.test :refer :all]
             [routes.params :refer :all]))
 

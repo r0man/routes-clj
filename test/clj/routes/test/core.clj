@@ -139,6 +139,14 @@
     (is (= continent-route (:root route)))
     (is (= example (:server route)))))
 
+(deftest test-countries-of-continent-path
+  (is (= "/continents/1-europe/countries"
+         (countries-of-continent-path europe))))
+
+(deftest test-countries-of-continent-url
+  (is (= "https://example.com/continents/1-europe/countries"
+         (countries-of-continent-url europe))))
+
 ;; COUNTRY OF CONTINENT
 
 (deftest test-country-of-continent-route
