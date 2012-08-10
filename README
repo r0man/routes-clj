@@ -19,8 +19,7 @@ A Clojure & ClojureScript library to build url and path fns.
 
 (defroute continents []
   ["/continents"]
-  :root root-route
-  :query-params {:location params/location})
+  :root root-route)
 
 (defroute continent [continent]
   ["/:id-:name" params/integer params/string]
