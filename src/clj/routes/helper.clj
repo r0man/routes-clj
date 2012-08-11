@@ -109,9 +109,29 @@
   "Returns the arguments of the route."
   [route] (if route (concat (route-params (:root route)) (:params route))))
 
+(defn route-path
+  "Format the path of `route`."
+  [route & args]
+  (->> (map
+        (fn [[arg params]]
+          (map (fn [[attr param]]
+                 (if-let [v (get arg attr)]
+                   ((:format-fn param) v)))
+               (partition 2 params)))
+        (partition 2 (interleave args (route-params route))))
+       (flatten)
+       (apply format (route-pattern route))))
+
 (defn route-server
   "Returns the server of the route."
   [route] (if route (or (:server route) (route-server (:root route)))))
+
+(defn route-url
+  "Format the url of `route`."
+  [route & args]
+  (str (server-url (or *server* (:server route)))
+       (apply route-path route args)))
+
 
 (defn make-route [ns name args [pattern & params] & [options]]
   (map->Route
@@ -123,28 +143,6 @@
     :pattern (parse-pattern pattern)
     :params (apply make-params pattern params)
     :server (route-server options)}))
-
-(defn format-path [route & args]
-  (->> (map (fn [arg params]
-              (map #((:format-fn %1) (get arg (keyword (:name %1)))) params))
-            args (:params route))
-       (flatten)
-       (apply format (:pattern route))))
-
-(defn format-path [route & args]
-  (->> (map
-        (fn [[arg params]]
-          (map (fn [[attr param]]
-                 (if-let [v (get arg attr)]
-                   ((:format-fn param) v)))
-               (partition 2 params)))
-        (partition 2 (interleave args (route-params route))))
-       (flatten)
-       (apply format (route-pattern route))))
-
-(defn format-url [route & args]
-  (str (server-url (or *server* (:server route)))
-       (apply format-path route args)))
 
 (defn qualified?
   "Returns true if the `s` is namespace qualified, otherwise false."

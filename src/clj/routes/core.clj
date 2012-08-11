@@ -1,6 +1,6 @@
 (ns routes.core
-  (:require [routes.helper :refer [route make-params parse-pattern make-route]]
-            [routes.helper :refer [route-args route-symbol register qualified?]]
+  (:require [routes.helper :refer [make-route route route-args route-symbol]]
+            [routes.helper :refer [register qualified? make-params parse-pattern]]
             [routes.server :refer [*server*]]))
 
 (defn- qualify [s]
@@ -28,9 +28,9 @@
             :params ~(apply make-params pattern)
             :server (or ~(:server options#) (:server ~(:root options#)))})))
        (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#)]
-         (routes.helper/format-path ~symbol# ~@(route-args route#)))
+         (routes.helper/route-path ~symbol# ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#)]
-         (routes.helper/format-url ~symbol# ~@(route-args route#))))))
+         (routes.helper/route-url ~symbol# ~@(route-args route#))))))
 
 (defmacro defparam [name doc & [format-fn parse-fn]]
   (let [name# name]

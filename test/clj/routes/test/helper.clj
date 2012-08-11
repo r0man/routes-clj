@@ -5,9 +5,9 @@
         routes.server
         routes.test.core))
 
-(deftest test-format-path
+(deftest test-route-path
   (are [r args expected]
-    (is (= expected (apply format-path r args)))
+    (is (= expected (apply route-path r args)))
     continents-route []
     "/continents"
     continent-route [europe]
@@ -17,9 +17,9 @@
     country-of-continent-2-route [europe spain]
     "/continents/1-europe/countries/es-spain"))
 
-(deftest test-format-url
+(deftest test-route-url
   (are [r args expected]
-    (is (= expected (apply format-url r args)))
+    (is (= expected (apply route-url r args)))
     continents-route []
     "https://example.com/continents"
     continent-route [europe]
