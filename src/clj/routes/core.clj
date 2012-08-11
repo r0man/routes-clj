@@ -1,6 +1,6 @@
 (ns routes.core
   (:require [routes.helper :refer [route route-args route-path route-url route-symbol route-server]]
-            [routes.helper :refer [make-route make-params parse-pattern register qualified?]]
+            [routes.helper :refer [map->Route make-route make-params parse-pattern register qualified?]]
             [routes.server :refer [*server*]]))
 
 (defn- qualify [s]
@@ -19,7 +19,7 @@
     `(do
        (def ^:export ~symbol#
          (register
-          (routes.helper/map->Route
+          (map->Route
            {:ns (quote ~(symbol (str *ns*)))
             :name (quote ~symbol#)
             :root ~(route-symbol (:root route#))
