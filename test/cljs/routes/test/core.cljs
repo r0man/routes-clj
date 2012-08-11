@@ -75,7 +75,6 @@
   (let [route addresses-route]
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
-    (assert (= 'routes.test.core/addresses-route (:qualified route)))
     (assert (= 'addresses-route (:name route)))
     (assert (= [] (route-args route)))
     (assert (= [] (route-params route)))
@@ -96,7 +95,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'address-route (:name route)))
-    (assert (= 'routes.test.core/address-route (:qualified route)))
     (assert (= '[address] (route-args route)))
     (assert (= [[:location params/location]] (route-params route)))
     (assert (= "/addresses/%s" (route-pattern route)))
@@ -118,7 +116,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'continents-route (:name route)))
-    (assert (= 'routes.test.core/continents-route (:qualified route)))
     (assert (= [] (route-args route)))
     (assert (= [] (route-params route)))
     (assert (= "/continents" (route-pattern route)))
@@ -138,7 +135,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'continent-route (:name route)))
-    (assert (= 'routes.test.core/continent-route (:qualified route)))
     (assert (= ['continent] (route-args route)))
     (assert (= [[:id params/integer :name params/string]]
                (route-params route)))
@@ -159,7 +155,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'countries-route (:name route)))
-    (assert (= 'routes.test.core/countries-route (:qualified route)))
     (assert (= [] (route-args route)))
     (assert (= [] (route-params route)))
     (assert (= "/countries" (route-pattern route)))
@@ -179,7 +174,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'countries-of-continent-route (:name route)))
-    (assert (= 'routes.test.core/countries-of-continent-route (:qualified route)))
     (assert (= '[continent] (route-args route)))
     (assert (= [[:id params/integer :name params/string]]
                (route-params route)))
@@ -202,7 +196,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'country-of-continent-1-route (:name route)))
-    (assert (= 'routes.test.core/country-of-continent-1-route (:qualified route)))
     (assert (= '[continent country] (route-args route)))
     (assert (= [[:id params/integer :name params/string]
                 [:iso-3166-1-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
@@ -226,7 +219,6 @@
     (assert (route? route))
     (assert (= 'routes.test.core (:ns route)))
     (assert (= 'country-of-continent-2-route (:name route)))
-    (assert (= 'routes.test.core/country-of-continent-2-route (:qualified route)))
     (assert (= '[continent country] (route-args route)))
     (assert (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (assert (nil? (:root route)))

@@ -7,11 +7,7 @@
 
 (def ^:dynamic *routes* (atom {}))
 
-(defprotocol IRoute
-  (-format [route args] "Format the `route`.")
-  (-parse [route s] "Parse the `route`."))
-
-(defrecord Route [])
+(defrecord Route [ns name root args pattern params server])
 
 (defn link-to
   "Wraps some content in a HTML hyperlink with the supplied URL."
@@ -137,7 +133,6 @@
   (map->Route
    {:ns ns
     :name (symbol name)
-    :qualified (symbol (str ns "/" name))
     :root (:root options)
     :args args
     :pattern (parse-pattern pattern)

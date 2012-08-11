@@ -21,7 +21,6 @@
           (routes.helper/map->Route
            {:ns (quote ~(symbol (str *ns*)))
             :name (quote ~symbol#)
-            :qualified (quote ~(symbol (str *ns* "/" symbol#)))
             :root ~(route-symbol (:root route#))
             :args (quote ~args)
             :pattern ~(parse-pattern (first pattern))

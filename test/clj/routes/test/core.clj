@@ -75,7 +75,6 @@
   (let [route addresses-route]
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
-    (is (= 'routes.test.core/addresses-route (:qualified route)))
     (is (= 'addresses-route (:name route)))
     (is (= [] (route-args route)))
     (is (= [] (route-params route)))
@@ -96,7 +95,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'address-route (:name route)))
-    (is (= 'routes.test.core/address-route (:qualified route)))
     (is (= '[address] (route-args route)))
     (is (= [[:location params/location]] (route-params route)))
     (is (= "/addresses/%s" (route-pattern route)))
@@ -118,7 +116,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'continents-route (:name route)))
-    (is (= 'routes.test.core/continents-route (:qualified route)))
     (is (= [] (route-args route)))
     (is (= [] (route-params route)))
     (is (= "/continents" (route-pattern route)))
@@ -138,7 +135,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'continent-route (:name route)))
-    (is (= 'routes.test.core/continent-route (:qualified route)))
     (is (= ['continent] (route-args route)))
     (is (= [[:id params/integer :name params/string]]
            (route-params route)))
@@ -159,7 +155,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'countries-route (:name route)))
-    (is (= 'routes.test.core/countries-route (:qualified route)))
     (is (= [] (route-args route)))
     (is (= [] (route-params route)))
     (is (= "/countries" (route-pattern route)))
@@ -179,7 +174,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'countries-of-continent-route (:name route)))
-    (is (= 'routes.test.core/countries-of-continent-route (:qualified route)))
     (is (= '[continent] (route-args route)))
     (is (= [[:id params/integer :name params/string]]
            (route-params route)))
@@ -202,7 +196,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'country-of-continent-1-route (:name route)))
-    (is (= 'routes.test.core/country-of-continent-1-route (:qualified route)))
     (is (= '[continent country] (route-args route)))
     (is (= [[:id params/integer :name params/string]
             [:iso-3166-1-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
@@ -226,7 +219,6 @@
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
     (is (= 'country-of-continent-2-route (:name route)))
-    (is (= 'routes.test.core/country-of-continent-2-route (:qualified route)))
     (is (= '[continent country] (route-args route)))
     ;; (is (= [[:id params/integer :name params/string]
     ;;         [:iso-3166-2-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
