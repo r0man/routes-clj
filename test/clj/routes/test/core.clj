@@ -69,6 +69,12 @@
 (deftest test-root-url
   (is (= "https://example.com/" (root-url))))
 
+(deftest test-root-request
+  (let [request (root-request)]
+    (is (= :get (:request-method request)))
+    (is (= (root-path) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
+
 ;; ADDRESSES
 
 (deftest test-addresses-route
@@ -87,6 +93,12 @@
 
 (deftest test-addresses-url
   (is (= "https://example.com/addresses" (addresses-url))))
+
+(deftest test-addresses-request
+  (let [request (addresses-request)]
+    (is (= :get (:request-method request)))
+    (is (= (addresses-path) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
 
 ;; ADDRESS
 
@@ -109,6 +121,12 @@
   (is (= "https://example.com/addresses/43.4073349,-2.6983217"
          (address-url address-of-mundaka))))
 
+(deftest test-address-request
+  (let [request (address-request address-of-mundaka)]
+    (is (= :get (:request-method request)))
+    (is (= (address-path address-of-mundaka) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
+
 ;; CONTINENTS
 
 (deftest test-continents-route
@@ -127,6 +145,12 @@
 
 (deftest test-continents-url
   (is (= "https://example.com/continents" (continents-url))))
+
+(deftest test-continents-request
+  (let [request (continents-request)]
+    (is (= :get (:request-method request)))
+    (is (= (continents-path) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
 
 ;; CONTINENT
 
@@ -148,6 +172,12 @@
 (deftest test-continent-url
   (is (= "https://example.com/continents/1-europe" (continent-url europe))) )
 
+(deftest test-continent-request
+  (let [request (continent-request europe)]
+    (is (= :get (:request-method request)))
+    (is (= (continent-path europe) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
+
 ;; COUNTRIES
 
 (deftest test-countries-route
@@ -166,6 +196,12 @@
 
 (deftest test-countries-url
   (is (= "https://example.com/countries" (countries-url))))
+
+(deftest test-countries-request
+  (let [request (countries-request)]
+    (is (= :get (:request-method request)))
+    (is (= (countries-path) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
 
 ;; COUNTRIES OF CONTINENT
 
@@ -188,6 +224,12 @@
 (deftest test-countries-of-continent-url
   (is (= "https://example.com/continents/1-europe/countries"
          (countries-of-continent-url europe))))
+
+(deftest test-countries-of-continent-request
+  (let [request (countries-of-continent-request europe)]
+    (is (= :get (:request-method request)))
+    (is (= (countries-of-continent-path europe) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
 
 ;; COUNTRY OF CONTINENT #1
 
@@ -212,6 +254,12 @@
   (is (= "https://example.com/continents/1-europe/countries/es-spain"
          (country-of-continent-1-url europe spain))))
 
+(deftest test-country-of-continent-1-request
+  (let [request (country-of-continent-1-request europe spain)]
+    (is (= :get (:request-method request)))
+    (is (= (country-of-continent-1-path europe spain) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))
+
 ;; COUNTRY OF CONTINENT #2
 
 (deftest test-country-of-continent-2-route
@@ -234,3 +282,9 @@
 (deftest test-country-of-continent-2-url
   (is (= "https://example.com/continents/1-europe/countries/es-spain"
          (country-of-continent-2-url europe spain))))
+
+(deftest test-country-of-continent-2-request
+  (let [request (country-of-continent-2-request europe spain)]
+    (is (= :get (:request-method request)))
+    (is (= (country-of-continent-2-path europe spain) (:uri request)))
+    (is (= (:server-name example) (:server-name request)))))

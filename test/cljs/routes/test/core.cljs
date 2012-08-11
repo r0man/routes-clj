@@ -69,6 +69,12 @@
 (defn test-root-url []
   (assert (= "https://example.com/" (root-url))))
 
+(defn test-root-request []
+  (let [request (root-request)]
+    (assert (= :get (:request-method request)))
+    (assert (= (root-path) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
+
 ;; ADDRESSES
 
 (defn test-addresses-route []
@@ -87,6 +93,12 @@
 
 (defn test-addresses-url []
   (assert (= "https://example.com/addresses" (addresses-url))))
+
+(defn test-addresses-request []
+  (let [request (addresses-request)]
+    (assert (= :get (:request-method request)))
+    (assert (= (addresses-path) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
 
 ;; ADDRESS
 
@@ -109,6 +121,12 @@
   (assert (= "https://example.com/addresses/43.4073349,-2.6983217"
              (address-url address-of-mundaka))))
 
+(defn test-address-request []
+  (let [request (address-request address-of-mundaka)]
+    (assert (= :get (:request-method request)))
+    (assert (= (address-path address-of-mundaka) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
+
 ;; CONTINENTS
 
 (defn test-continents-route []
@@ -127,6 +145,12 @@
 
 (defn test-continents-url []
   (assert (= "https://example.com/continents" (continents-url))))
+
+(defn test-continents-request []
+  (let [request (continents-request)]
+    (assert (= :get (:request-method request)))
+    (assert (= (continents-path) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
 
 ;; CONTINENT
 
@@ -148,6 +172,12 @@
 (defn test-continent-url []
   (assert (= "https://example.com/continents/1-europe" (continent-url europe))) )
 
+(defn test-continent-request []
+  (let [request (continent-request europe)]
+    (assert (= :get (:request-method request)))
+    (assert (= (continent-path europe) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
+
 ;; COUNTRIES
 
 (defn test-countries-route []
@@ -166,6 +196,12 @@
 
 (defn test-countries-url []
   (assert (= "https://example.com/countries" (countries-url))))
+
+(defn test-countries-request []
+  (let [request (countries-request)]
+    (assert (= :get (:request-method request)))
+    (assert (= (countries-path) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
 
 ;; COUNTRIES OF CONTINENT
 
@@ -188,6 +224,12 @@
 (defn test-countries-of-continent-url []
   (assert (= "https://example.com/continents/1-europe/countries"
              (countries-of-continent-url europe))))
+
+(defn test-countries-of-continent-request []
+  (let [request (countries-of-continent-request europe)]
+    (assert (= :get (:request-method request)))
+    (assert (= (countries-of-continent-path europe) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
 
 ;; COUNTRY OF CONTINENT #1
 
@@ -212,6 +254,12 @@
   (assert (= "https://example.com/continents/1-europe/countries/es-spain"
              (country-of-continent-1-url europe spain))))
 
+(defn test-country-of-continent-1-request []
+  (let [request (country-of-continent-1-request europe spain)]
+    (assert (= :get (:request-method request)))
+    (assert (= (country-of-continent-1-path europe spain) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
+
 ;; COUNTRY OF CONTINENT #2
 
 (defn test-country-of-continent-2-route []
@@ -232,31 +280,54 @@
   (assert (= "https://example.com/continents/1-europe/countries/es-spain"
              (country-of-continent-2-url europe spain))))
 
+(defn test-country-of-continent-2-request []
+  (let [request (country-of-continent-2-request europe spain)]
+    (assert (= :get (:request-method request)))
+    (assert (= (country-of-continent-2-path europe spain) (:uri request)))
+    (assert (= (:server-name example) (:server-name request)))))
+
 (defn test []
   (test-root-route)
   (test-root-path)
   (test-root-url)
+  (test-root-request)
+
   (test-addresses-route)
   (test-addresses-path)
   (test-addresses-url)
+  (test-addresses-request)
+
   (test-address-route)
   (test-address-path)
   (test-address-url)
+  (test-address-request)
+
   (test-continents-route)
   (test-continents-path)
   (test-continents-url)
+  (test-continents-request)
+
   (test-continent-route)
   (test-continent-path)
   (test-continent-url)
+  (test-continent-request)
+
   (test-countries-route)
   (test-countries-path)
   (test-countries-url)
+  (test-countries-request)
+
   (test-countries-of-continent-route)
   (test-countries-of-continent-path)
   (test-countries-of-continent-url)
+  (test-countries-of-continent-request)
+
   (test-country-of-continent-1-route)
   (test-country-of-continent-1-path)
   (test-country-of-continent-1-url)
+  (test-country-of-continent-1-request)
+
   (test-country-of-continent-2-route)
   (test-country-of-continent-2-path)
-  (test-country-of-continent-2-url))
+  (test-country-of-continent-2-url)
+  (test-country-of-continent-2-request))
