@@ -15,7 +15,7 @@
                        {:compiler {:output-to "target/routes-debug.js"
                                    :optimizations :whitespace
                                    :pretty-print true}
-                        :source-path "test/cljs"}
+                        :source-path "src/cljs"}
                        {:compiler {:output-to "target/routes.js"
                                    :optimizations :advanced
                                    :pretty-print true}
