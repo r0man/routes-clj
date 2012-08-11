@@ -14,7 +14,7 @@
         pattern# pattern
         options# (assoc options :root (route (qualify (:root options))))
         symbol# (symbol (str name# "-route"))
-        route# (register (make-route (str *ns*) symbol# args pattern options#))]
+        route# (register (make-route (str *ns*) symbol# args# pattern options#))]
     `(do
        (def ^:export ~symbol#
          (routes.helper/register
@@ -22,7 +22,7 @@
            {:ns (quote ~(symbol (str *ns*)))
             :name (quote ~symbol#)
             :root ~(route-symbol (:root route#))
-            :args (quote ~args)
+            :args (quote ~args#)
             :pattern ~(parse-pattern (first pattern))
             :params ~(apply make-params pattern)
             :server (or ~(:server options#) (:server ~(:root options#)))})))
