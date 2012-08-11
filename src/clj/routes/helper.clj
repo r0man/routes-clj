@@ -128,8 +128,9 @@
   (str (server-url (or *server* (:server route)))
        (apply route-path route args)))
 
-
-(defn make-route [ns name args [pattern & params] & [options]]
+(defn make-route
+  "Make a new route."
+  [ns name args [pattern & params] & [options]]
   (map->Route
    {:ns ns
     :name (symbol name)
