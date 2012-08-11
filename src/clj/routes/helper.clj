@@ -21,24 +21,18 @@
         content (if-not (empty? content) content)]
     [:a {:href href} content]))
 
-(defn qualified?
-  "Returns true if the `s` is namespace qualified, otherwise false."
-  [s] (if s (re-matches #".+/.+" (str s))))
-
-(defn qualify [sym]
-  (when sym
-    (if (qualified? sym)
-      (symbol sym)
-      (symbol (str *ns* "/" sym)))))
-
 (defn route
   "Lookup a route by `symbol`."
-  [sym] (get @*routes* (qualify sym)))
+  [sym] (get @*routes* sym))
+
+(defn route-symbol
+  "Returns the namespace qualified name of `route` as a symbol."
+  [route] (symbol (str (:ns route) "/" (:name route))))
 
 (defn register
   "Register `route` by it's name."
   [route]
-  (swap! *routes* assoc (:qualified route) route)
+  (swap! *routes* assoc (route-symbol route) route)
   route)
 
 (defn parse-keys [pattern]
@@ -119,18 +113,16 @@
   "Returns the server of the route."
   [route] (if route (or (:server route) (route-server (:root route)))))
 
-(defn make-route [name args [pattern & params] & [options]]
-  (let [ns (symbol (str (or (:ns options) *ns*)))
-        root (route (:root options))]
-    (map->Route
-     {:ns ns
-      :name (symbol name)
-      :qualified (symbol (str ns "/" name))
-      :root root
-      :args args
-      :pattern (parse-pattern pattern)
-      :params (apply make-params pattern params)
-      :server (or (:server options) (route-server (:root options)))})))
+(defn make-route [ns name args [pattern & params] & [options]]
+  (map->Route
+   {:ns ns
+    :name (symbol name)
+    :qualified (symbol (str ns "/" name))
+    :root (:root options)
+    :args args
+    :pattern (parse-pattern pattern)
+    :params (apply make-params pattern params)
+    :server (route-server options)}))
 
 (defn format-path [route & args]
   (->> (map (fn [arg params]
@@ -150,17 +142,10 @@
        (flatten)
        (apply format (route-pattern route))))
 
-;; (defn format-path [route & args]
-;;   (interleave (route-params route) args))
-
 (defn format-url [route & args]
   (str (server-url (or *server* (:server route)))
        (apply format-path route args)))
 
-;; (require '[routes.params :as params])
-
-;; (make-route 'root '[] ["/"] :server {:server-name "example.com"})
-
-;; (make-route 'country '[]
-;;   ["/:iso-3166-1-alpha-2-:name" params/iso-3166-1-alpha-2 params/string]
-;;   :root 'countries-route)
+(defn qualified?
+  "Returns true if the `s` is namespace qualified, otherwise false."
+  [s] (if s (re-matches #".+/.+" (str s))))

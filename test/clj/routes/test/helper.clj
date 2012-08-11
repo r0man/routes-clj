@@ -29,19 +29,6 @@
     country-of-continent-2-route [europe spain]
     "https://example.com/continents/1-europe/countries/es-spain"))
 
-(deftest test-qualified?
-  (is (not (qualified? nil)))
-  (is (not (qualified? "")))
-  (is (not (qualified? 'root-route)))
-  (is (qualified? 'routes.test.fixtures/root-route)))
-
-(deftest test-qualify
-  (is (nil? (qualify nil)))
-  (is (= (symbol (str *ns* "/a"))
-         (qualify 'a)))
-  (is (= 'routes.test.helper/a
-         (qualify 'routes.test.helper/a))))
-
 (deftest link-to-test
   (is (= (link-to "http://example.com/")
          [:a {:href "http://example.com/"} nil]))
@@ -55,10 +42,14 @@
   (is (nil? (route "")))
   (is (nil? (route 'unknown-route))))
 
+(deftest test-route-symbol
+  (is (= (symbol (str *ns* "/example-route"))
+         (route-symbol {:ns *ns* :name 'example-route}))))
+
 (deftest test-register
-  (let [example-route {:qualified 'routes.test.helper/example-route}]
+  (let [example-route {:ns *ns* :name 'example-route}]
     (register example-route)
-    (is (= example-route (route 'routes.test.helper/example-route)))))
+    (is (= example-route (route (route-symbol example-route))))))
 
 (deftest test-split-by
   (are [coll counts expected]

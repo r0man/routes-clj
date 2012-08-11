@@ -1,6 +1,10 @@
 (ns routes.core
-  (:require [routes.helper :refer [route make-params parse-pattern make-route route-args register]]
+  (:require [routes.helper :refer [route make-params parse-pattern make-route]]
+            [routes.helper :refer [route-args register qualified?]]
             [routes.server :refer [*server*]]))
+
+(defn- qualify [s]
+  (symbol (str (if-not (qualified? s) (str *ns* "/")) s)))
 
 (defmacro defroute
   "Define a route."
@@ -8,9 +12,9 @@
   (let [name# name
         args# args
         pattern# pattern
-        options# options
+        options# (assoc options :root (route (qualify (:root options))))
         symbol# (symbol (str name# "-route"))
-        route# (register (make-route symbol# args pattern options))]
+        route# (register (make-route *ns* symbol# args pattern options#))]
     `(do
        (def ^:export ~symbol#
          (routes.helper/register
