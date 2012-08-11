@@ -2,27 +2,32 @@
   (:require [routes.params :as params])
   (:use clojure.test
         routes.helper
-        routes.server))
+        routes.server
+        routes.test.core))
 
-;; ;; (deftest test-format-path
-;; ;;   (are [r args expected]
-;; ;;     (is (= expected (apply format-path r args)))
-;; ;;     continents-route []
-;; ;;     "/continents"
-;; ;;     continent-route [europe]
-;; ;;     "/continents/1-europe"
-;; ;;     country-of-continent-route [europe spain]
-;; ;;     "/continents/1-europe/countries/es-spain"))
+(deftest test-format-path
+  (are [r args expected]
+    (is (= expected (apply format-path r args)))
+    continents-route []
+    "/continents"
+    continent-route [europe]
+    "/continents/1-europe"
+    country-of-continent-1-route [europe spain]
+    "/continents/1-europe/countries/es-spain"
+    country-of-continent-2-route [europe spain]
+    "/continents/1-europe/countries/es-spain"))
 
-;; ;; (deftest test-format-url
-;; ;;   (are [r args expected]
-;; ;;     (is (= expected (apply format-url r args)))
-;; ;;     continents-route []
-;; ;;     "https://example.com/continents"
-;; ;;     continent-route [europe]
-;; ;;     "https://example.com/continents/1-europe"
-;; ;;     country-of-continent-route [europe spain]
-;; ;;     "https://example.com/continents/1-europe/countries/es-spain"))
+(deftest test-format-url
+  (are [r args expected]
+    (is (= expected (apply format-url r args)))
+    continents-route []
+    "https://example.com/continents"
+    continent-route [europe]
+    "https://example.com/continents/1-europe"
+    country-of-continent-1-route [europe spain]
+    "https://example.com/continents/1-europe/countries/es-spain"
+    country-of-continent-2-route [europe spain]
+    "https://example.com/continents/1-europe/countries/es-spain"))
 
 (deftest test-qualified?
   (is (not (qualified? nil)))
