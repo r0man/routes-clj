@@ -1,6 +1,6 @@
 (ns routes.core
-  (:require [routes.helper :refer [make-route route route-args route-symbol]]
-            [routes.helper :refer [register qualified? make-params parse-pattern]]
+  (:require [routes.helper :refer [route route-args route-path route-url route-symbol route-server]]
+            [routes.helper :refer [make-route make-params parse-pattern register qualified?]]
             [routes.server :refer [*server*]]))
 
 (defn- qualify [s]
@@ -18,7 +18,7 @@
         route# (register (make-route (str *ns*) symbol# args# pattern# params# options#))]
     `(do
        (def ^:export ~symbol#
-         (routes.helper/register
+         (register
           (routes.helper/map->Route
            {:ns (quote ~(symbol (str *ns*)))
             :name (quote ~symbol#)
@@ -28,15 +28,15 @@
             :params ~(apply make-params pattern# params#)
             :server (or ~(:server options#) (:server ~(:root options#)))})))
        (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#)]
-         (routes.helper/route-path ~symbol# ~@(route-args route#)))
+         (route-path ~symbol# ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#)]
-         (routes.helper/route-url ~symbol# ~@(route-args route#)))
+         (route-url ~symbol# ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#)]
-         (let [server# (routes.helper/route-server ~symbol#)]
+         (let [server# (route-server ~symbol#)]
            {:scheme (:scheme server#)
             :server-name (:server-name server#)
             :server-port (:server-port server#)
-            :uri (routes.helper/route-path ~symbol# ~@(route-args route#))
+            :uri (route-path ~symbol# ~@(route-args route#))
             :request-method :get})))))
 
 (defmacro defparam [name doc & [format-fn parse-fn]]
