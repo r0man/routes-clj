@@ -43,6 +43,7 @@
   (is (nil? (route 'unknown-route))))
 
 (deftest test-route-symbol
+  (is (nil? (route-symbol nil)))
   (is (= (symbol (str *ns* "/example-route"))
          (route-symbol {:ns *ns* :name 'example-route}))))
 

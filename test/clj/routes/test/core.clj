@@ -197,7 +197,7 @@
 
 ;; COUNTRY OF CONTINENT #1
 
-(deftest test-country-of-continent-route-1
+(deftest test-country-of-continent-1-route
   (let [route country-of-continent-1-route]
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))
@@ -221,7 +221,7 @@
 
 ;; COUNTRY OF CONTINENT #2
 
-(deftest test-country-of-continent-route-2
+(deftest test-country-of-continent-2-route
   (let [route country-of-continent-2-route]
     (is (route? route))
     (is (= 'routes.test.core (:ns route)))

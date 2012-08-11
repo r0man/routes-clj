@@ -27,7 +27,7 @@
 
 (defn route-symbol
   "Returns the namespace qualified name of `route` as a symbol."
-  [route] (symbol (str (:ns route) "/" (:name route))))
+  [route] (if route (symbol (str (:ns route) "/" (:name route)))))
 
 (defn register
   "Register `route` by it's name."
