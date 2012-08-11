@@ -8,13 +8,14 @@
 
 (defmacro defroute
   "Define a route."
-  [name args pattern & {:as options}]
+  [name args [pattern & params] & {:as options}]
   (let [name# name
         args# args
         pattern# pattern
+        params# params
         options# (assoc options :root (route (qualify (:root options))))
         symbol# (symbol (str name# "-route"))
-        route# (register (make-route (str *ns*) symbol# args# pattern options#))]
+        route# (register (make-route (str *ns*) symbol# args# pattern# params# options#))]
     `(do
        (def ^:export ~symbol#
          (routes.helper/register
@@ -23,8 +24,8 @@
             :name (quote ~symbol#)
             :root ~(route-symbol (:root route#))
             :args (quote ~args#)
-            :pattern ~(parse-pattern (first pattern))
-            :params ~(apply make-params pattern)
+            :pattern ~(parse-pattern pattern#)
+            :params ~(apply make-params pattern# params#)
             :server (or ~(:server options#) (:server ~(:root options#)))})))
        (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#)]
          (routes.helper/route-path ~symbol# ~@(route-args route#)))
