@@ -23,6 +23,9 @@
 (defn parse-iso-3166-1-alpha-3 [s]
   (lower-case (apply str (take 3 (str s)))))
 
+(defn parse-iso-639-1 [s]
+  (lower-case (apply str (take 2 (str s)))))
+
 (defparam iso-3166-1-alpha-2
   "A two-letter country code defined in the ISO 3166-1 standard."
   parse-iso-3166-1-alpha-2
@@ -32,6 +35,11 @@
   "A three-letter country code defined in the ISO 3166-1 standard."
   parse-iso-3166-1-alpha-3
   parse-iso-3166-1-alpha-3)
+
+(defparam iso-639-1
+  "A two-letter language code defined in the ISO iso-639-1 standard."
+  parse-iso-639-1
+  parse-iso-639-1)
 
 (defparam location
   "A geographical location."
