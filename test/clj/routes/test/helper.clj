@@ -8,25 +8,25 @@
 (deftest test-route-path
   (are [r args expected]
     (is (= expected (apply route-path r args)))
-    continents-route []
+    (continents-route) []
     "/continents"
-    continent-route [europe]
+    (continent-route) [europe]
     "/continents/1-europe"
-    country-of-continent-1-route [europe spain]
+    (country-of-continent-1-route) [europe spain]
     "/continents/1-europe/countries/es-spain"
-    country-of-continent-2-route [europe spain]
+    (country-of-continent-2-route) [europe spain]
     "/continents/1-europe/countries/es-spain"))
 
 (deftest test-route-url
   (are [r args expected]
     (is (= expected (apply route-url r args)))
-    continents-route []
+    (continents-route) []
     "https://example.com/continents"
-    continent-route [europe]
+    (continent-route) [europe]
     "https://example.com/continents/1-europe"
-    country-of-continent-1-route [europe spain]
+    (country-of-continent-1-route) [europe spain]
     "https://example.com/continents/1-europe/countries/es-spain"
-    country-of-continent-2-route [europe spain]
+    (country-of-continent-2-route) [europe spain]
     "https://example.com/continents/1-europe/countries/es-spain"))
 
 (deftest link-to-test

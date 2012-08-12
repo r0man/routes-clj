@@ -93,17 +93,23 @@
   "Returns true if `arg` is a route, otherwise false."
   [arg] (instance? Route arg))
 
+(defn route-root
+  "Returns the root of the `route`."
+  [route] (if (fn? (:root route))
+            ((:root route))
+            (:root route)))
+
 (defn route-args
-  "Returns the arguments of the route."
-  [route] (if route (concat (route-args (:root route)) (:args route))))
+  "Returns the arguments of the `route`."
+  [route] (if route (concat (route-args (route-root route)) (:args route))))
 
 (defn route-pattern
-  "Returns the pattern of the route."
-  [route] (if route (path (route-pattern (:root route)) (:pattern route))))
+  "Returns the pattern of the `route`."
+  [route] (if route (path (route-pattern (route-root route)) (:pattern route))))
 
 (defn route-params
-  "Returns the arguments of the route."
-  [route] (if route (concat (route-params (:root route)) (:params route))))
+  "Returns the arguments of the `route`."
+  [route] (if route (concat (route-params (route-root route)) (:params route))))
 
 (defn route-path
   "Format the path of `route`."
@@ -119,8 +125,8 @@
        (apply format (route-pattern route))))
 
 (defn route-server
-  "Returns the server of the route."
-  [route] (if route (or (:server route) (route-server (:root route)))))
+  "Returns the server of the `route`."
+  [route] (if route (or (:server route) (route-server (route-root route)))))
 
 (defn route-url
   "Format the url of `route`."
@@ -131,15 +137,14 @@
 (defn make-route
   "Make a new route."
   [ns name args pattern params & [options]]
-  (register
-   (map->Route
-    {:ns (str ns)
-     :name (str name)
-     :root (:root options)
-     :args args
-     :pattern (parse-pattern pattern)
-     :params (apply make-params pattern params)
-     :server (route-server options)})))
+  (map->Route
+   {:ns (str ns)
+    :name (str name)
+    :root (route-root options)
+    :args args
+    :pattern (parse-pattern pattern)
+    :params (apply make-params pattern params)
+    :server (route-server options)}))
 
 (defn qualified?
   "Returns true if the `s` is namespace qualified, otherwise false."

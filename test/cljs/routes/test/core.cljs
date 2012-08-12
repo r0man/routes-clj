@@ -56,7 +56,7 @@
 ;; ROOT
 
 (defn test-root-route []
-  (let [route root-route]
+  (let [route (root-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "root-route" (:name route)))
@@ -81,14 +81,14 @@
 ;; ADDRESSES
 
 (defn test-addresses-route []
-  (let [route addresses-route]
+  (let [route (addresses-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "addresses-route" (:name route)))
     (assert (= [] (route-args route)))
     (assert (= [] (route-params route)))
     (assert (= "/addresses" (route-pattern route)))
-    (assert (= root-route (:root route)))
+    (assert (= (root-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-addresses-path []
@@ -106,14 +106,14 @@
 ;; ADDRESS
 
 (defn test-address-route []
-  (let [route address-route]
+  (let [route (address-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "address-route" (:name route)))
     (assert (= '[address] (route-args route)))
     (assert (= [[:location params/location]] (route-params route)))
     (assert (= "/addresses/%s" (route-pattern route)))
-    (assert (= addresses-route (:root route)))
+    (assert (= (addresses-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-address-path []
@@ -133,14 +133,14 @@
 ;; CONTINENTS
 
 (defn test-continents-route []
-  (let [route continents-route]
+  (let [route (continents-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "continents-route" (:name route)))
     (assert (= [] (route-args route)))
     (assert (= [] (route-params route)))
     (assert (= "/continents" (route-pattern route)))
-    (assert (= root-route (:root route)))
+    (assert (= (root-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-continents-path []
@@ -158,7 +158,7 @@
 ;; CONTINENT
 
 (defn test-continent-route []
-  (let [route continent-route]
+  (let [route (continent-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "continent-route" (:name route)))
@@ -166,7 +166,7 @@
     (assert (= [[:id params/integer :name params/string]]
                (route-params route)))
     (assert (= "/continents/%s-%s" (route-pattern route)))
-    (assert (= continents-route (:root route)))
+    (assert (= (continents-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-continent-path []
@@ -184,14 +184,14 @@
 ;; COUNTRIES
 
 (defn test-countries-route []
-  (let [route countries-route]
+  (let [route (countries-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "countries-route" (:name route)))
     (assert (= [] (route-args route)))
     (assert (= [] (route-params route)))
     (assert (= "/countries" (route-pattern route)))
-    (assert (= root-route (:root route)))
+    (assert (= (root-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-countries-path []
@@ -209,7 +209,7 @@
 ;; COUNTRIES OF CONTINENT
 
 (defn test-countries-of-continent-route []
-  (let [route countries-of-continent-route]
+  (let [route (countries-of-continent-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "countries-of-continent-route" (:name route)))
@@ -217,7 +217,7 @@
     (assert (= [[:id params/integer :name params/string]]
                (route-params route)))
     (assert (= "/continents/%s-%s/countries" (route-pattern route)))
-    (assert (= continent-route (:root route)))
+    (assert (= (continent-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-countries-of-continent-path []
@@ -237,7 +237,7 @@
 ;; COUNTRY OF CONTINENT #1
 
 (defn test-country-of-continent-1-route []
-  (let [route country-of-continent-1-route]
+  (let [route (country-of-continent-1-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "country-of-continent-1-route" (:name route)))
@@ -246,7 +246,7 @@
                 [:iso-3166-1-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
                (route-params route)))
     (assert (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
-    (assert (= countries-of-continent-route (:root route)))
+    (assert (= (countries-of-continent-route) (:root route)))
     (assert (= *server* (route-server route)))))
 
 (defn test-country-of-continent-1-path []
@@ -266,11 +266,14 @@
 ;; COUNTRY OF CONTINENT #2
 
 (defn test-country-of-continent-2-route []
-  (let [route country-of-continent-2-route]
+  (let [route (country-of-continent-2-route)]
     (assert (route? route))
     (assert (= "routes.test.core" (:ns route)))
     (assert (= "country-of-continent-2-route" (:name route)))
     (assert (= '[continent country] (route-args route)))
+    ;; (assert (= [[:id params/integer :name params/string]
+    ;;         [:iso-3166-2-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
+    ;;        (route-params route)))
     (assert (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (assert (nil? (:root route)))
     (assert (= *server* (route-server route)))))
@@ -289,7 +292,12 @@
     (assert (= (country-of-continent-2-path europe spain) (:uri request)))
     (assert (= (:server-name *server*) (:server-name request)))))
 
+(defn test-url-with-binding []
+  (binding [*server* {:scheme :https :server-name "other.com" :server-port 443}]
+    (assert (= "https://other.com/" (root-url)))))
+
 (defn test []
+
   (test-root-route)
   (test-root-path)
   (test-root-url)
@@ -333,4 +341,6 @@
   (test-country-of-continent-2-route)
   (test-country-of-continent-2-path)
   (test-country-of-continent-2-url)
-  (test-country-of-continent-2-request))
+  (test-country-of-continent-2-request)
+
+  (test-url-with-binding))

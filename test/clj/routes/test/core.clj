@@ -56,7 +56,7 @@
 ;; ROOT
 
 (deftest test-root-route
-  (let [route root-route]
+  (let [route (root-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "root-route" (:name route)))
@@ -81,14 +81,14 @@
 ;; ADDRESSES
 
 (deftest test-addresses-route
-  (let [route addresses-route]
+  (let [route (addresses-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "addresses-route" (:name route)))
     (is (= [] (route-args route)))
     (is (= [] (route-params route)))
     (is (= "/addresses" (route-pattern route)))
-    (is (= root-route (:root route)))
+    (is (= (root-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-addresses-path
@@ -106,14 +106,14 @@
 ;; ADDRESS
 
 (deftest test-address-route
-  (let [route address-route]
+  (let [route (address-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "address-route" (:name route)))
     (is (= '[address] (route-args route)))
     (is (= [[:location params/location]] (route-params route)))
     (is (= "/addresses/%s" (route-pattern route)))
-    (is (= addresses-route (:root route)))
+    (is (= (addresses-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-address-path
@@ -133,14 +133,14 @@
 ;; CONTINENTS
 
 (deftest test-continents-route
-  (let [route continents-route]
+  (let [route (continents-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "continents-route" (:name route)))
     (is (= [] (route-args route)))
     (is (= [] (route-params route)))
     (is (= "/continents" (route-pattern route)))
-    (is (= root-route (:root route)))
+    (is (= (root-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-continents-path
@@ -158,7 +158,7 @@
 ;; CONTINENT
 
 (deftest test-continent-route
-  (let [route continent-route]
+  (let [route (continent-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "continent-route" (:name route)))
@@ -166,7 +166,7 @@
     (is (= [[:id params/integer :name params/string]]
            (route-params route)))
     (is (= "/continents/%s-%s" (route-pattern route)))
-    (is (= continents-route (:root route)))
+    (is (= (continents-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-continent-path
@@ -184,14 +184,14 @@
 ;; COUNTRIES
 
 (deftest test-countries-route
-  (let [route countries-route]
+  (let [route (countries-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "countries-route" (:name route)))
     (is (= [] (route-args route)))
     (is (= [] (route-params route)))
     (is (= "/countries" (route-pattern route)))
-    (is (= root-route (:root route)))
+    (is (= (root-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-countries-path
@@ -209,7 +209,7 @@
 ;; COUNTRIES OF CONTINENT
 
 (deftest test-countries-of-continent-route
-  (let [route countries-of-continent-route]
+  (let [route (countries-of-continent-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "countries-of-continent-route" (:name route)))
@@ -217,7 +217,7 @@
     (is (= [[:id params/integer :name params/string]]
            (route-params route)))
     (is (= "/continents/%s-%s/countries" (route-pattern route)))
-    (is (= continent-route (:root route)))
+    (is (= (continent-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-countries-of-continent-path
@@ -237,7 +237,7 @@
 ;; COUNTRY OF CONTINENT #1
 
 (deftest test-country-of-continent-1-route
-  (let [route country-of-continent-1-route]
+  (let [route (country-of-continent-1-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "country-of-continent-1-route" (:name route)))
@@ -246,7 +246,7 @@
             [:iso-3166-1-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
            (route-params route)))
     (is (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
-    (is (= countries-of-continent-route (:root route)))
+    (is (= (countries-of-continent-route) (:root route)))
     (is (= *server* (route-server route)))))
 
 (deftest test-country-of-continent-1-path
@@ -266,7 +266,7 @@
 ;; COUNTRY OF CONTINENT #2
 
 (deftest test-country-of-continent-2-route
-  (let [route country-of-continent-2-route]
+  (let [route (country-of-continent-2-route)]
     (is (route? route))
     (is (= "routes.test.core" (:ns route)))
     (is (= "country-of-continent-2-route" (:name route)))
@@ -291,3 +291,7 @@
     (is (= :get (:request-method request)))
     (is (= (country-of-continent-2-path europe spain) (:uri request)))
     (is (= (:server-name *server*) (:server-name request)))))
+
+(deftest test-url-with-binding
+  (binding [*server* {:scheme :https :server-name "other.com" :server-port 443}]
+    (is (= "https://other.com/" (root-url)))))

@@ -9,7 +9,7 @@
   :plugins [[lein-cljsbuild "0.2.5"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
-                                   :optimizations :whitespace
+                                   :optimizations :advanced
                                    :pretty-print true}
                         :source-path "test/cljs"}
                        {:compiler {:output-to "target/routes-debug.js"

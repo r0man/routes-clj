@@ -14,22 +14,22 @@
         params# (apply vector params)
         options# options
         symbol# (symbol (str name# "-route"))
-        route# (make-route
-                (str *ns*) symbol# args# pattern# params#
-                (assoc options# :root (route (qualify (:root options#)))))]
+        route# (register (make-route
+                          (str *ns*) symbol# args# pattern# params#
+                          (assoc options# :root (route (qualify (:root options#))))))]
     `(do
-       (def ^:export ~symbol#
+       (defn ^:export ~symbol# []
          (make-route ~(str *ns*) ~(str symbol#) (quote ~args#) ~pattern# ~params# ~options#))
        (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#)]
-         (route-path ~symbol# ~@(route-args route#)))
+         (route-path (~symbol#) ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#)]
-         (route-url ~symbol# ~@(route-args route#)))
+         (route-url (~symbol#) ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#)]
-         (let [~'server (route-server ~symbol#)]
+         (let [~'server (route-server (~symbol#))]
            {:scheme (:scheme ~'server)
             :server-name (:server-name ~'server)
             :server-port (:server-port ~'server)
-            :uri (route-path ~symbol# ~@(route-args route#))
+            :uri (route-path (~symbol#) ~@(route-args route#))
             :request-method :get})))))
 
 (defmacro defparam [name doc & [format-fn parse-fn]]
