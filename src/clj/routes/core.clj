@@ -12,21 +12,15 @@
   (let [name# name
         args# args
         pattern# pattern
-        params# params
-        options# (assoc options :root (route (qualify (:root options))))
+        params# (apply vector params)
+        options# options
         symbol# (symbol (str name# "-route"))
-        route# (register (make-route (str *ns*) symbol# args# pattern# params# options#))]
+        route# (make-route
+                (str *ns*) symbol# args# pattern# params#
+                (assoc options# :root (route (qualify (:root options#)))))]
     `(do
        (def ^:export ~symbol#
-         (register
-          (map->Route
-           {:ns (quote ~(symbol (str *ns*)))
-            :name (quote ~symbol#)
-            :root ~(route-symbol (:root route#))
-            :args (quote ~args#)
-            :pattern ~(parse-pattern pattern#)
-            :params ~(apply make-params pattern# params#)
-            :server (or ~(:server options#) (:server ~(:root options#)))})))
+         (make-route ~(str *ns*) ~(str symbol#) (quote ~args#) ~pattern# ~params# ~options#))
        (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#)]
          (route-path ~symbol# ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#)]

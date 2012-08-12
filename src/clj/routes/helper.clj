@@ -131,14 +131,15 @@
 (defn make-route
   "Make a new route."
   [ns name args pattern params & [options]]
-  (map->Route
-   {:ns ns
-    :name (symbol name)
-    :root (:root options)
-    :args args
-    :pattern (parse-pattern pattern)
-    :params (apply make-params pattern params)
-    :server (route-server options)}))
+  (register
+   (map->Route
+    {:ns (str ns)
+     :name (str name)
+     :root (:root options)
+     :args args
+     :pattern (parse-pattern pattern)
+     :params (apply make-params pattern params)
+     :server (route-server options)})))
 
 (defn qualified?
   "Returns true if the `s` is namespace qualified, otherwise false."
