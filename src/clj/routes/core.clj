@@ -3,7 +3,7 @@
             [routes.helper :refer [map->Route make-route make-params parse-pattern register qualified?]]
             [routes.server :refer [*server*]]))
 
-(defn- qualify [s]
+(defn qualify [s]
   (symbol (str (if-not (qualified? s) (str *ns* "/")) s)))
 
 (defmacro defroute
