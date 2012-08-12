@@ -26,10 +26,10 @@
        (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#)]
          (route-url ~symbol# ~@(route-args route#)))
        (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#)]
-         (let [server# (route-server ~symbol#)]
-           {:scheme (:scheme server#)
-            :server-name (:server-name server#)
-            :server-port (:server-port server#)
+         (let [~'server (route-server ~symbol#)]
+           {:scheme (:scheme ~'server)
+            :server-name (:server-name ~'server)
+            :server-port (:server-port ~'server)
             :uri (route-path ~symbol# ~@(route-args route#))
             :request-method :get})))))
 
