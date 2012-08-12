@@ -2,7 +2,6 @@
   (:require-macros [routes.core :refer [defroute]])
   (:require [routes.helper :refer [route route? route-args route-server route-pattern]]
             [routes.helper :refer [route-params parse-url]]
-            [routes.server :refer [example]]
             [routes.params :as params]))
 
 (def europe {:id 1 :name "Europe"})
@@ -11,8 +10,11 @@
 
 (def address-of-mundaka {:location {:latitude 43.4073349 :longitude -2.6983217}})
 
+(def ^:dynamic *server*
+  {:scheme :https :server-name "example.com" :server-port 443})
+
 (defroute root []
-  ["/"] :server example)
+  ["/"] :server *server*)
 
 (defroute addresses []
   ["/addresses"]
@@ -49,7 +51,7 @@
   ["/continents/:id-:name/countries/:iso-3166-1-alpha-2-:name"
    params/integer params/string
    params/iso-3166-1-alpha-2 params/string]
-  :server example)
+  :server *server*)
 
 ;; ROOT
 
@@ -62,7 +64,7 @@
     (assert (= [] (route-params route)))
     (assert (= "/" (route-pattern route)))
     (assert (nil? (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-root-path []
   (assert (= "/" (root-path))))
@@ -74,7 +76,7 @@
   (let [request (root-request)]
     (assert (= :get (:request-method request)))
     (assert (= (root-path) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; ADDRESSES
 
@@ -87,7 +89,7 @@
     (assert (= [] (route-params route)))
     (assert (= "/addresses" (route-pattern route)))
     (assert (= root-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-addresses-path []
   (assert (= "/addresses" (addresses-path))))
@@ -99,7 +101,7 @@
   (let [request (addresses-request)]
     (assert (= :get (:request-method request)))
     (assert (= (addresses-path) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; ADDRESS
 
@@ -112,7 +114,7 @@
     (assert (= [[:location params/location]] (route-params route)))
     (assert (= "/addresses/%s" (route-pattern route)))
     (assert (= addresses-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-address-path []
   (assert (= "/addresses/43.4073349,-2.6983217"
@@ -126,7 +128,7 @@
   (let [request (address-request address-of-mundaka)]
     (assert (= :get (:request-method request)))
     (assert (= (address-path address-of-mundaka) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; CONTINENTS
 
@@ -139,7 +141,7 @@
     (assert (= [] (route-params route)))
     (assert (= "/continents" (route-pattern route)))
     (assert (= root-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-continents-path []
   (assert (= "/continents" (continents-path))))
@@ -151,7 +153,7 @@
   (let [request (continents-request)]
     (assert (= :get (:request-method request)))
     (assert (= (continents-path) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; CONTINENT
 
@@ -165,7 +167,7 @@
                (route-params route)))
     (assert (= "/continents/%s-%s" (route-pattern route)))
     (assert (= continents-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-continent-path []
   (assert (= "/continents/1-europe" (continent-path europe))))
@@ -177,7 +179,7 @@
   (let [request (continent-request europe)]
     (assert (= :get (:request-method request)))
     (assert (= (continent-path europe) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRIES
 
@@ -190,7 +192,7 @@
     (assert (= [] (route-params route)))
     (assert (= "/countries" (route-pattern route)))
     (assert (= root-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-countries-path []
   (assert (= "/countries" (countries-path))))
@@ -202,7 +204,7 @@
   (let [request (countries-request)]
     (assert (= :get (:request-method request)))
     (assert (= (countries-path) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRIES OF CONTINENT
 
@@ -216,7 +218,7 @@
                (route-params route)))
     (assert (= "/continents/%s-%s/countries" (route-pattern route)))
     (assert (= continent-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-countries-of-continent-path []
   (assert (= "/continents/1-europe/countries"
@@ -230,7 +232,7 @@
   (let [request (countries-of-continent-request europe)]
     (assert (= :get (:request-method request)))
     (assert (= (countries-of-continent-path europe) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRY OF CONTINENT #1
 
@@ -245,7 +247,7 @@
                (route-params route)))
     (assert (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (assert (= countries-of-continent-route (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-country-of-continent-1-path []
   (assert (= "/continents/1-europe/countries/es-spain"
@@ -259,7 +261,7 @@
   (let [request (country-of-continent-1-request europe spain)]
     (assert (= :get (:request-method request)))
     (assert (= (country-of-continent-1-path europe spain) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRY OF CONTINENT #2
 
@@ -271,7 +273,7 @@
     (assert (= '[continent country] (route-args route)))
     (assert (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (assert (nil? (:root route)))
-    (assert (= example (route-server route)))))
+    (assert (= *server* (route-server route)))))
 
 (defn test-country-of-continent-2-path []
   (assert (= "/continents/1-europe/countries/es-spain"
@@ -285,7 +287,7 @@
   (let [request (country-of-continent-2-request europe spain)]
     (assert (= :get (:request-method request)))
     (assert (= (country-of-continent-2-path europe spain) (:uri request)))
-    (assert (= (:server-name example) (:server-name request)))))
+    (assert (= (:server-name *server*) (:server-name request)))))
 
 (defn test []
   (test-root-route)

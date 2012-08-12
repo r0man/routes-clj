@@ -1,7 +1,6 @@
 (ns routes.core
   (:require [routes.helper :refer [route route-args route-path route-url route-symbol route-server]]
-            [routes.helper :refer [map->Route make-route make-params parse-pattern register qualified?]]
-            [routes.server :refer [*server*]]))
+            [routes.helper :refer [map->Route make-route make-params parse-pattern register qualified?]]))
 
 (defn qualify [s]
   (symbol (str (if-not (qualified? s) (str *ns* "/")) s)))
@@ -41,9 +40,3 @@
         ~doc
         (or ~format-fn str)
         (or ~parse-fn identity)))))
-
-(defmacro with-server [server & body]
-  "Evaluate `body` with *server* bound to `server`."
-  `(binding [routes.server/*server*
-             (routes.helper/parse-url ~server)]
-     ~@body))

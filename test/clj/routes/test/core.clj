@@ -2,8 +2,7 @@
   (:require [routes.params :as params])
   (:use clojure.test
         routes.core
-        routes.helper
-        routes.server))
+        routes.helper))
 
 (def europe {:id 1 :name "Europe"})
 
@@ -11,8 +10,11 @@
 
 (def address-of-mundaka {:location {:latitude 43.4073349 :longitude -2.6983217}})
 
+(def ^:dynamic *server*
+  {:scheme :https :server-name "example.com" :server-port 443})
+
 (defroute root []
-  ["/"] :server example)
+  ["/"] :server *server*)
 
 (defroute addresses []
   ["/addresses"]
@@ -49,7 +51,7 @@
   ["/continents/:id-:name/countries/:iso-3166-1-alpha-2-:name"
    params/integer params/string
    params/iso-3166-1-alpha-2 params/string]
-  :server example)
+  :server *server*)
 
 ;; ROOT
 
@@ -62,7 +64,7 @@
     (is (= [] (route-params route)))
     (is (= "/" (route-pattern route)))
     (is (nil? (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-root-path
   (is (= "/" (root-path))))
@@ -74,7 +76,7 @@
   (let [request (root-request)]
     (is (= :get (:request-method request)))
     (is (= (root-path) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; ADDRESSES
 
@@ -87,7 +89,7 @@
     (is (= [] (route-params route)))
     (is (= "/addresses" (route-pattern route)))
     (is (= root-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-addresses-path
   (is (= "/addresses" (addresses-path))))
@@ -99,7 +101,7 @@
   (let [request (addresses-request)]
     (is (= :get (:request-method request)))
     (is (= (addresses-path) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; ADDRESS
 
@@ -112,7 +114,7 @@
     (is (= [[:location params/location]] (route-params route)))
     (is (= "/addresses/%s" (route-pattern route)))
     (is (= addresses-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-address-path
   (is (= "/addresses/43.4073349,-2.6983217"
@@ -126,7 +128,7 @@
   (let [request (address-request address-of-mundaka)]
     (is (= :get (:request-method request)))
     (is (= (address-path address-of-mundaka) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; CONTINENTS
 
@@ -139,7 +141,7 @@
     (is (= [] (route-params route)))
     (is (= "/continents" (route-pattern route)))
     (is (= root-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-continents-path
   (is (= "/continents" (continents-path))))
@@ -151,7 +153,7 @@
   (let [request (continents-request)]
     (is (= :get (:request-method request)))
     (is (= (continents-path) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; CONTINENT
 
@@ -165,7 +167,7 @@
            (route-params route)))
     (is (= "/continents/%s-%s" (route-pattern route)))
     (is (= continents-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-continent-path
   (is (= "/continents/1-europe" (continent-path europe))))
@@ -177,7 +179,7 @@
   (let [request (continent-request europe)]
     (is (= :get (:request-method request)))
     (is (= (continent-path europe) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRIES
 
@@ -190,7 +192,7 @@
     (is (= [] (route-params route)))
     (is (= "/countries" (route-pattern route)))
     (is (= root-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-countries-path
   (is (= "/countries" (countries-path))))
@@ -202,7 +204,7 @@
   (let [request (countries-request)]
     (is (= :get (:request-method request)))
     (is (= (countries-path) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRIES OF CONTINENT
 
@@ -216,7 +218,7 @@
            (route-params route)))
     (is (= "/continents/%s-%s/countries" (route-pattern route)))
     (is (= continent-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-countries-of-continent-path
   (is (= "/continents/1-europe/countries"
@@ -230,7 +232,7 @@
   (let [request (countries-of-continent-request europe)]
     (is (= :get (:request-method request)))
     (is (= (countries-of-continent-path europe) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRY OF CONTINENT #1
 
@@ -245,7 +247,7 @@
            (route-params route)))
     (is (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (is (= countries-of-continent-route (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-country-of-continent-1-path
   (is (= "/continents/1-europe/countries/es-spain"
@@ -259,7 +261,7 @@
   (let [request (country-of-continent-1-request europe spain)]
     (is (= :get (:request-method request)))
     (is (= (country-of-continent-1-path europe spain) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))
 
 ;; COUNTRY OF CONTINENT #2
 
@@ -274,7 +276,7 @@
     ;;        (route-params route)))
     (is (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (is (nil? (:root route)))
-    (is (= example (route-server route)))))
+    (is (= *server* (route-server route)))))
 
 (deftest test-country-of-continent-2-path
   (is (= "/continents/1-europe/countries/es-spain"
@@ -288,4 +290,4 @@
   (let [request (country-of-continent-2-request europe spain)]
     (is (= :get (:request-method request)))
     (is (= (country-of-continent-2-path europe spain) (:uri request)))
-    (is (= (:server-name example) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))))

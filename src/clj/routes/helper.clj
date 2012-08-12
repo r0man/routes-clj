@@ -3,7 +3,7 @@
   (:require [clojure.string :refer [blank? join split replace]]
             [inflections.core :refer [parameterize]]
             [inflections.number :refer [parse-integer]]
-            [routes.server :refer [*server* server-url]]))
+            [routes.server :refer [server-url]]))
 
 (def ^:dynamic *routes* (atom {}))
 
@@ -125,7 +125,7 @@
 (defn route-url
   "Format the url of `route`."
   [route & args]
-  (str (server-url (or *server* (:server route)))
+  (str (server-url (:server route))
        (apply route-path route args)))
 
 (defn make-route

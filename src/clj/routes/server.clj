@@ -1,13 +1,8 @@
 (ns routes.server)
 
-(def ^:dynamic *server* nil)
-
 (def ^:dynamic *ports*
   {:http 80
    :https 443})
-
-(def example
-  {:scheme :https :server-name "example.com" :server-port 443})
 
 (defn server-url
   "Returns the url of `server`."
@@ -21,9 +16,3 @@
           (cond )
           (if (and server-port (not (= server-port (get *ports* scheme))))
             (str ":" server-port))))))
-
-(defn wrap-server
-  [handler]
-  (fn [request]
-    (binding [*server* request]
-      (handler request))))
