@@ -4,7 +4,7 @@
    [routes.core :refer [defparam]])
   (:require [clojure.string :refer [blank? lower-case]]
             [inflections.core :refer [parameterize]]
-            [inflections.number :refer [parse-float parse-integer parse-location]]))
+            [inflections.util :refer [parse-float parse-integer parse-location]]))
 
 (defprotocol IParameter
   (-format [param obj] "Format `obj` as a route `param`.")

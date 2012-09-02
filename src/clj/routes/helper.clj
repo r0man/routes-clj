@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [replace])
   (:require [clojure.string :refer [blank? join split replace]]
             [inflections.core :refer [parameterize]]
-            [inflections.number :refer [parse-integer]]
+            [inflections.util :refer [parse-integer]]
             [routes.server :refer [server-url]]))
 
 (def ^:dynamic *routes* (atom {}))
