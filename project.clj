@@ -6,7 +6,7 @@
   :min-lein-version "2.0.0"
   :dependencies [[inflections "0.7.4-SNAPSHOT"]
                  [org.clojure/clojure "1.4.0"]]
-  :plugins [[lein-cljsbuild "0.2.9"]]
+  :plugins [[lein-cljsbuild "0.2.10"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
                                    :optimizations :advanced
