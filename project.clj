@@ -4,22 +4,22 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
-  :dependencies [[inflections "0.7.5-SNAPSHOT"]
+  :dependencies [[inflections "0.7.6"]
                  [org.clojure/clojure "1.4.0"]]
-  :plugins [[lein-cljsbuild "0.2.10"]]
+  :plugins [[lein-cljsbuild "0.3.0"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
                                    :optimizations :advanced
                                    :pretty-print true}
-                        :source-path "test/cljs"}
+                        :source-paths ["test/cljs"]}
                        {:compiler {:output-to "target/routes-debug.js"
                                    :optimizations :whitespace
                                    :pretty-print true}
-                        :source-path "src/cljs"}
+                        :source-paths ["src/cljs"]}
                        {:compiler {:output-to "target/routes.js"
                                    :optimizations :advanced
                                    :pretty-print true}
-                        :source-path "src/cljs"
+                        :source-paths ["src/cljs"]
                         :jar true}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
