@@ -144,16 +144,23 @@
     (is (= *server* (route-server route)))))
 
 (deftest test-continents-path
-  (is (= "/continents" (continents-path))))
+  (is (= "/continents" (continents-path)))
+  (is (= "/continents?page=1" (continents-path :page 1))))
 
 (deftest test-continents-url
-  (is (= "https://example.com/continents" (continents-url))))
+  (is (= "https://example.com/continents" (continents-url)))
+  (is (= "https://example.com/continents?page=1" (continents-url :page 1))))
 
 (deftest test-continents-request
   (let [request (continents-request)]
     (is (= :get (:request-method request)))
     (is (= (continents-path) (:uri request)))
-    (is (= (:server-name *server*) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request))))
+  (let [request (continents-request :page 1)]
+    (is (= :get (:request-method request)))
+    (is (= (continents-path) (:uri request)))
+    (is (= (:server-name *server*) (:server-name request)))
+    (is (= {:page 1} (:query-params request)))))
 
 ;; CONTINENT
 

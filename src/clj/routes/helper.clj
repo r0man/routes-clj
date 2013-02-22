@@ -17,6 +17,11 @@
         content (if-not (empty? content) content)]
     [:a {:href href} content]))
 
+(defn format-params [params]
+  (->> (seq params)
+       (map (fn [[k v]] (str (name k) "=" (str v))))
+       (join "&")))
+
 (defn route
   "Lookup a route by `symbol`."
   [sym] (get @*routes* sym))
@@ -113,16 +118,18 @@
 
 (defn route-path
   "Format the path of `route`."
-  [route & args]
-  (->> (map
-        (fn [[arg params]]
-          (map (fn [[attr param]]
-                 (if-let [v (get arg attr)]
-                   ((:format-fn param) v)))
-               (partition 2 params)))
-        (partition 2 (interleave args (route-params route))))
-       (flatten)
-       (apply format (route-pattern route))))
+  [route args & {:as params}]
+  (str (->> (map
+             (fn [[arg params]]
+               (map (fn [[attr param]]
+                      (if-let [v (get arg attr)]
+                        ((:format-fn param) v)))
+                    (partition 2 params)))
+             (partition 2 (interleave args (route-params route))))
+            (flatten)
+            (apply format (route-pattern route)))
+       (if-not (empty? params)
+         (str "?" (format-params params)))))
 
 (defn route-server
   "Returns the server of the `route`."
@@ -130,9 +137,9 @@
 
 (defn route-url
   "Format the url of `route`."
-  [route & args]
+  [route args & params]
   (str (server-url (:server route))
-       (apply route-path route args)))
+       (apply route-path route args params)))
 
 (defn make-route
   "Make a new route."

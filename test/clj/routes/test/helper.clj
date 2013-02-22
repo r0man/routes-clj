@@ -7,7 +7,7 @@
 
 (deftest test-route-path
   (are [r args expected]
-    (is (= expected (apply route-path r args)))
+    (is (= expected (route-path r args)))
     (continents-route) []
     "/continents"
     (continent-route) [europe]
@@ -19,7 +19,7 @@
 
 (deftest test-route-url
   (are [r args expected]
-    (is (= expected (apply route-url r args)))
+    (is (= expected (route-url r args)))
     (continents-route) []
     "https://example.com/continents"
     (continent-route) [europe]

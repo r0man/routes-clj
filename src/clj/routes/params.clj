@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [format])
   (:require;*CLJSBUILD-REMOVE*;-macros
    [routes.core :refer [defparam]])
-  (:require [clojure.string :refer [blank? lower-case]]
+  (:require [clojure.string :refer [blank? lower-case join]]
             [inflections.core :refer [parameterize]]
             [inflections.util :refer [parse-float parse-integer parse-location]]))
 
@@ -37,7 +37,7 @@
   parse-iso-3166-1-alpha-3)
 
 (defparam iso-639-1
-  "A two-letter language code defined in the ISO iso-639-1 standard."
+  "A two-letter language code defined in the ISO 639-1 standard."
   parse-iso-639-1
   parse-iso-639-1)
 

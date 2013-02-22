@@ -20,17 +20,18 @@
     `(do
        (defn ^:export ~symbol# []
          (make-route ~(str *ns*) ~(str symbol#) (quote ~args#) ~pattern# ~params# ~options#))
-       (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#)]
-         (route-path (~symbol#) ~@(route-args route#)))
-       (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#)]
-         (route-url (~symbol#) ~@(route-args route#)))
-       (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#)]
+       (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#) & ~'params]
+         (apply route-path (~symbol#) [~@(route-args route#)] ~'params))
+       (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#) & ~'params]
+         (apply route-url (~symbol#) [~@(route-args route#)] ~'params))
+       (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#) & {:as ~'params}]
          (let [~'server (route-server (~symbol#))]
            {:scheme (:scheme ~'server)
             :server-name (:server-name ~'server)
             :server-port (:server-port ~'server)
-            :uri (route-path (~symbol#) ~@(route-args route#))
-            :request-method :get})))))
+            :uri (route-path (~symbol#) [~@(route-args route#)])
+            :request-method :get
+            :query-params ~'params})))))
 
 (defmacro defparam [name doc & [format-fn parse-fn]]
   (let [name# name]
