@@ -4,8 +4,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
-  :dependencies [[inflections "0.7.6"]
-                 [org.clojure/clojure "1.4.0"]]
+  :dependencies [[inflections "0.8.0"]
+                 [org.clojure/clojure "1.5.0"]]
   :plugins [[lein-cljsbuild "0.3.0"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
