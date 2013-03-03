@@ -145,18 +145,18 @@
 
 (deftest test-continents-path
   (is (= "/continents" (continents-path)))
-  (is (= "/continents?page=1" (continents-path :page 1))))
+  (is (= "/continents?page=1" (continents-path {:page 1}))))
 
 (deftest test-continents-url
   (is (= "https://example.com/continents" (continents-url)))
-  (is (= "https://example.com/continents?page=1" (continents-url :page 1))))
+  (is (= "https://example.com/continents?page=1" (continents-url {:page 1}))))
 
 (deftest test-continents-request
   (let [request (continents-request)]
     (is (= :get (:request-method request)))
     (is (= (continents-path) (:uri request)))
     (is (= (:server-name *server*) (:server-name request))))
-  (let [request (continents-request :page 1)]
+  (let [request (continents-request {:page 1})]
     (is (= :get (:request-method request)))
     (is (= (continents-path) (:uri request)))
     (is (= (:server-name *server*) (:server-name request)))
@@ -229,17 +229,22 @@
 
 (deftest test-countries-of-continent-path
   (is (= "/continents/1-europe/countries"
-         (countries-of-continent-path europe))))
+         (countries-of-continent-path europe)))
+  (is (= "/continents/1-europe/countries?page=1"
+         (countries-of-continent-path europe {:page 1}))))
 
 (deftest test-countries-of-continent-url
   (is (= "https://example.com/continents/1-europe/countries"
-         (countries-of-continent-url europe))))
+         (countries-of-continent-url europe)))
+  (is (= "https://example.com/continents/1-europe/countries?page=1"
+         (countries-of-continent-url europe {:page 1}))))
 
 (deftest test-countries-of-continent-request
-  (let [request (countries-of-continent-request europe)]
+  (let [request (countries-of-continent-request europe {:page 1})]
     (is (= :get (:request-method request)))
     (is (= (countries-of-continent-path europe) (:uri request)))
-    (is (= (:server-name *server*) (:server-name request)))))
+    (is (= (:server-name *server*) (:server-name request)))
+    (is (= {:page 1} (:query-params request)))))
 
 ;; COUNTRY OF CONTINENT #1
 
@@ -278,9 +283,9 @@
     (is (= "routes.test.core" (:ns route)))
     (is (= "country-of-continent-2-route" (:name route)))
     (is (= '[continent country] (route-args route)))
-    ;; (is (= [[:id params/integer :name params/string]
-    ;;         [:iso-3166-2-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
-    ;;        (route-params route)))
+    (is (= [[:id params/integer :name params/string]
+            [:iso-3166-1-alpha-2 params/iso-3166-1-alpha-2 :name params/string]]
+           (route-params route)))
     (is (= "/continents/%s-%s/countries/%s-%s" (route-pattern route)))
     (is (nil? (:root route)))
     (is (= *server* (route-server route)))))

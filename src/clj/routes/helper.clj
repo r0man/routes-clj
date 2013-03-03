@@ -118,7 +118,7 @@
 
 (defn route-path
   "Format the path of `route`."
-  [route args & {:as params}]
+  [route args & [params]]
   (str (->> (map
              (fn [[arg params]]
                (map (fn [[attr param]]
@@ -137,9 +137,9 @@
 
 (defn route-url
   "Format the url of `route`."
-  [route args & params]
+  [route args & [params]]
   (str (server-url (:server route))
-       (apply route-path route args params)))
+       (route-path route args params)))
 
 (defn make-route
   "Make a new route."

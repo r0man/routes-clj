@@ -145,18 +145,18 @@
 
 (defn test-continents-path []
   (assert (= "/continents" (continents-path)))
-  (assert (= "/continents?page=1" (continents-path :page 1))))
+  (assert (= "/continents?page=1" (continents-path {:page 1}))))
 
 (defn test-continents-url []
   (assert (= "https://example.com/continents" (continents-url)))
-  (assert (= "https://example.com/continents?page=1" (continents-url :page 1))))
+  (assert (= "https://example.com/continents?page=1" (continents-url {:page 1}))))
 
 (defn test-continents-request []
   (let [request (continents-request)]
     (assert (= :get (:request-method request)))
     (assert (= (continents-path) (:uri request)))
     (assert (= (:server-name *server*) (:server-name request))))
-  (let [request (continents-request :page 1)]
+  (let [request (continents-request {:page 1})]
     (assert (= :get (:request-method request)))
     (assert (= (continents-path) (:uri request)))
     (assert (= (:server-name *server*) (:server-name request)))

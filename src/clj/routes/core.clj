@@ -20,11 +20,11 @@
     `(do
        (defn ^:export ~symbol# []
          (make-route ~(str *ns*) ~(str symbol#) (quote ~args#) ~pattern# ~params# ~options#))
-       (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#) & ~'params]
-         (apply route-path (~symbol#) [~@(route-args route#)] ~'params))
-       (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#) & ~'params]
-         (apply route-url (~symbol#) [~@(route-args route#)] ~'params))
-       (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#) & {:as ~'params}]
+       (defn ^:export ~(symbol (str name# "-path")) [~@(route-args route#) & [~'params]]
+         (route-path (~symbol#) [~@(route-args route#)] ~'params))
+       (defn ^:export ~(symbol (str name# "-url")) [~@(route-args route#) & [~'params]]
+         (route-url (~symbol#) [~@(route-args route#)] ~'params))
+       (defn ^:export ~(symbol (str name# "-request")) [~@(route-args route#) & [~'params]]
          (let [~'server (route-server (~symbol#))]
            {:scheme (:scheme ~'server)
             :server-name (:server-name ~'server)
