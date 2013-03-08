@@ -20,8 +20,7 @@
                        {:compiler {:output-to "target/routes.js"
                                    :optimizations :advanced
                                    :pretty-print true}
-                        :source-paths ["src"]
-                        :jar true}]
+                        :source-paths ["src"]}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
               :crossovers [routes.helper
