@@ -1,11 +1,11 @@
-(defproject routes-clj "0.0.2"
+(defproject routes-clj "0.0.3-SNAPSHOT"
   :description "A Clojure & ClojureScript library to build url and path fns."
   :url "http://github.com/r0man/routes-clj"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
-  :dependencies [[inflections "0.8.0"]
-                 [org.clojure/clojure "1.5.0"]]
+  :dependencies [[inflections "0.8.1"]
+                 [org.clojure/clojure "1.5.1"]]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.3"]]}}
   :plugins [[lein-cljsbuild "0.3.0"]]
   :hooks [leiningen.cljsbuild]

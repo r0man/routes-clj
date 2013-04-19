@@ -12,3 +12,4 @@ pom.xml
 /.lein-cljsbuild-compiler-*
 /.lein-cljsbuild-repl
 /out
+/pom.xml.asc
