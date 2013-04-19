@@ -8,7 +8,10 @@ p.injectJs(require('system').args[1]);
 
 p.onConsoleMessage = function (x) { console.log(x); };
 p.evaluate(function () {
-    cemerick.cljs.test.set_print_fn();
+    cemerick.cljs.test.set_print_fn_BANG_(function(x) {
+        x = x.replace(/\n/g, "");
+        console.log(x);
+    });
 });
 
 var success = p.evaluate(function () {
