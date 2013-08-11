@@ -6,8 +6,8 @@
   :min-lein-version "2.0.0"
   :dependencies [[inflections "0.8.1"]
                  [org.clojure/clojure "1.5.1"]]
-  :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.3"]]}}
-  :plugins [[lein-cljsbuild "0.3.0"]]
+  :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]]}}
+  :plugins [[lein-cljsbuild "0.3.2"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:compiler {:output-to "target/routes-test.js"
                                    :optimizations :advanced
@@ -23,9 +23,7 @@
                         :source-paths ["src"]}]
               :crossover-jar true
               :crossover-path ".crossover-cljs"
-              :crossovers [routes.helper
-                           routes.params
-                           routes.server]
+              :crossovers [routes.util]
               :repl-listen-port 9000
               :repl-launch-commands
               {"chromium" ["chromium" "http://localhost:9000/"]
