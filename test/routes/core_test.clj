@@ -1,5 +1,5 @@
 (ns routes.core-test
-  (:require [routes.core :refer [defroutes]]))
+  (:require [routes.core :refer :all]))
 
 (defroutes routes
   [{:route-name :continents,
@@ -37,4 +37,5 @@
     :path-params [:id]}]
   :scheme :http
   :server-name "example.com"
-  :server-port 80)
+  :server-port 80
+  :as :auto)
