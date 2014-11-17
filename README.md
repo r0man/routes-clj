@@ -10,18 +10,18 @@ A Clojure & ClojureScript routing library.
 (require '[routes.core :refer :all])
 
 (defroutes my-routes
-  [{:route-name :countries,
-    :path-re #"/countries",
-    :method :get,
-    :path "/countries",
-    :path-parts ["" "countries"],
+  [{:route-name :countries
+    :path-re #"/countries"
+    :method :get
+    :path "/countries"
+    :path-parts ["" "countries"]
     :path-params []}
-   {:route-name :country,
-    :path-re #"/countries/([^/]+)",
-    :method :get,
-    :path-constraints {:id "([^/]+)"},
-    :path "/countries/:id",
-    :path-parts ["" "countries" :id],
+   {:route-name :country
+    :path-re #"/countries/([^/]+)"
+    :method :get
+    :path-constraints {:id "([^/]+)"}
+    :path "/countries/:id"
+    :path-parts ["" "countries" :id]
     :path-params [:id]}])
 
 (path-for :countries)
