@@ -1,4 +1,4 @@
-(defproject routes-clj "0.1.0-SNAPSHOT"
+(defproject routes-clj "0.1.0"
   :description "A Clojure & ClojureScript routing library."
   :url "http://github.com/r0man/routes-clj"
   :author "r0man"
