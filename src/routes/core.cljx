@@ -94,7 +94,7 @@
 
 (defmacro defroutes
   "Define routes."
-  [name routes & [opts]]
+  [name routes & {:as opts}]
   `(do (def ~name (routes.core/zip-routes ~routes ~opts))
        (defn ~'path-for [~'route-name & [~'opts]]
          (routes.core/path-for-routes ~name ~'route-name ~'opts))
