@@ -146,11 +146,11 @@
     (is (= (:server-port default) (:server-port request)))
     (is (= "/continents" (:uri request)))))
 
-(deftest test-path-for-routes
-  (is (nil? (routes/path-for-routes my-routes nil)))
-  (is (nil? (routes/path-for-routes my-routes :not-existing)))
+(deftest test-path-by-route
+  (is (nil? (routes/path-by-route my-routes nil)))
+  (is (nil? (routes/path-by-route my-routes :not-existing)))
   (are [name opts expected]
-    (is (= expected (routes/path-for-routes my-routes name opts)))
+    (is (= expected (routes/path-by-route my-routes name opts)))
     :continents {} "/continents"
     :continents {:query-params {:a 1 :b 2}} "/continents?a=1&b=2"
     :continent {} "/continents/:id"
@@ -163,7 +163,7 @@
     :update-continent {:id 1} "/continents/1"
     :update-continent {:path-params {:id 1}} "/continents/1"))
 
-(deftest test-url-for-routes
+(deftest test-url-by-route
   (is (nil? (url-for nil nil)))
   (is (nil? (url-for {} nil)))
   (is (nil? (url-for nil :not-existing)))
@@ -189,6 +189,36 @@
       server :continents {:scheme :https :server-port 443} "https://other.com/continents"
       nil :continents {:scheme :https :server-port 8080} "https://example.com:8080/continents"
       server :continents {:scheme :https :server-port 8080} "https://other.com:8080/continents")))
+
+(deftest test-request-for
+  (are [request expected]
+    (= (update-in expected [:path-re] str)
+       (update-in request [:path-re] str))
+    (request-for server :continents)
+    {:path "/continents"
+     :method :get
+     :path-re #"/continents"
+     :path-parts ["" "continents"]
+     :server-port 80
+     :query-params {}
+     :uri "/continents"
+     :server-name "example.com"
+     :route-name :continents
+     :path-params []
+     :scheme :http}
+    (request-for server :continent {:path-params {:id 1}})
+    {:path "/continents/:id"
+     :method :get
+     :path-constraints {:id "([^/]+)"}
+     :path-re #"/continents/([^/]+)"
+     :path-parts ["" "continents" :id]
+     :server-port 80
+     :query-params {}
+     :uri "/continents/1"
+     :server-name "example.com"
+     :route-name :continent
+     :path-params {:id 1}
+     :scheme :http}))
 
 #+clj
 (deftest test-read-routes
