@@ -32,6 +32,6 @@
                                                "phantom" ["phantomjs" :runner "target/testable.js"]}
                                :builds [{:source-paths ["target/classes" "target/test-classes"]
                                          :compiler {:output-to "target/testable.js"
-                                                    :optimizations :whitespace
+                                                    :optimizations :advanced
                                                     :pretty-print true}}]}
                    :test-paths ["target/test-classes"]}})
