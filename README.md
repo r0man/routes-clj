@@ -1,4 +1,6 @@
 # ROUTES-CLJ
+  [![Build Status](https://travis-ci.org/r0man/routes-clj.png)](https://travis-ci.org/r0man/routes-clj)
+  [![Dependencies Status](http://jarkeeper.com/r0man/routes-clj/status.png)](http://jarkeeper.com/r0man/routes-clj)
 
 A Clojure & ClojureScript routing library.
 
