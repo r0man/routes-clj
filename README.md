@@ -22,10 +22,7 @@ A Clojure & ClojureScript routing library.
     :path-constraints {:id "([^/]+)"},
     :path "/countries/:id",
     :path-parts ["" "countries" :id],
-    :path-params [:id]}]
-  {:scheme :http
-   :server-name "example.com"
-   :server-port 80})
+    :path-params [:id]}])
 
 (path-for :countries)
 ;=> "/countries"
