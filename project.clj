@@ -6,7 +6,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :cljsbuild {:builds []}
-  :dependencies [[noencore "0.1.16"]]
+  :dependencies [[noencore "0.1.17"]]
   :deploy-repositories [["releases" :clojars]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
                                   [org.clojure/clojurescript "0.0-2371"]]

@@ -12,7 +12,7 @@
    :server-name "example.com"
    :server-port 80})
 
-(defroutes routes
+(defroutes my-routes
   [{:route-name :continents,
     :path-re #"/continents",
     :method :get,
@@ -48,7 +48,6 @@
     :path-params [:id]}]
   {:scheme :http
    :server-name "example.com"
-   ;; :server-name "api.burningswell.dev"
    :server-port 80})
 
 (deftest test-assoc-route
@@ -67,7 +66,7 @@
 
 (deftest test-expand-path
   (are [name opts expected]
-    (is (= expected (routes/expand-path (get routes name) {:path-params opts})))
+    (is (= expected (routes/expand-path (get my-routes name) {:path-params opts})))
     :continents {} "/continents"
     :continent {:id 1} "/continents/1"
     :create-continent {} "/continents"
@@ -75,7 +74,7 @@
     :update-continent {:id 1} "/continents/1"))
 
 (deftest test-resolve-route-empty-params
-  (let [request (routes/resolve-route routes :continent {})]
+  (let [request (routes/resolve-route my-routes :continent {})]
     (is (= :get (:method request)))
     (is (= :http (:scheme request)))
     (is (= "example.com" (:server-name request)))
@@ -83,9 +82,9 @@
     (is (= "/continents/:id" (:uri request)))))
 
 (deftest test-resolve-route-not-existing
-  (is (nil? (routes/resolve-route routes :not-existing)))
+  (is (nil? (routes/resolve-route my-routes :not-existing)))
   (let [request {:method :get :url "http://example.com"}]
-    (is (= request (routes/resolve-route routes :not-existing request)))))
+    (is (= request (routes/resolve-route my-routes :not-existing request)))))
 
 (deftest test-resolve-route-without-routes
   (is (nil? (routes/resolve-route nil)))
@@ -94,10 +93,10 @@
 
 (deftest test-resolve-route-with-request
   (let [request {:method :get :url "http://example.com"}]
-    (is (= request (routes/resolve-route routes request)))))
+    (is (= request (routes/resolve-route my-routes request)))))
 
 (deftest test-resolve-route-continent
-  (let [request (routes/resolve-route routes :continent {:path-params {:id 1}})]
+  (let [request (routes/resolve-route my-routes :continent {:path-params {:id 1}})]
     (is (= :get (:method request)))
     (is (= :http (:scheme request)))
     (is (= "example.com" (:server-name request)))
@@ -105,7 +104,7 @@
     (is (= "/continents/1" (:uri request)))))
 
 (deftest test-resolve-route-continents
-  (let [request (routes/resolve-route routes :continents)]
+  (let [request (routes/resolve-route my-routes :continents)]
     (is (= :get (:method request)))
     (is (= :http (:scheme request)))
     (is (= "example.com" (:server-name request)))
@@ -113,7 +112,7 @@
     (is (= "/continents" (:uri request)))))
 
 (deftest test-resolve-route-create-continent
-  (let [request (routes/resolve-route routes :create-continent {:edn-body {:id 1 :name "Europe"}})]
+  (let [request (routes/resolve-route my-routes :create-continent {:edn-body {:id 1 :name "Europe"}})]
     (is (= {:id 1 :name "Europe"} (:edn-body request)))
     (is (= :post (:method request)))
     (is (= :http (:scheme request)))
@@ -122,7 +121,7 @@
     (is (= "/continents" (:uri request)))))
 
 (deftest test-resolve-route-delete-continent
-  (let [request (routes/resolve-route routes :delete-continent {:path-params {:id 1}})]
+  (let [request (routes/resolve-route my-routes :delete-continent {:path-params {:id 1}})]
     (is (= :delete (:method request)))
     (is (= :http (:scheme request)))
     (is (= "example.com" (:server-name request)))
@@ -130,7 +129,7 @@
     (is (= "/continents/1" (:uri request)))))
 
 (deftest test-resolve-route-update-continent
-  (let [request (routes/resolve-route routes :update-continent {:edn-body {:id 1 :name "Europe"}})]
+  (let [request (routes/resolve-route my-routes :update-continent {:edn-body {:id 1 :name "Europe"}})]
     (is (= {:id 1 :name "Europe"} (:edn-body request)))
     (is (= :put (:method request)))
     (is (= :http (:scheme request)))
@@ -140,7 +139,7 @@
 
 (deftest test-resolve-route-override-defaults
   (let [default {:scheme :https :server-name "other.com" :server-port 8080}
-        request (routes/resolve-route routes :continents default)]
+        request (routes/resolve-route my-routes :continents default)]
     (is (= :get (:method request)))
     (is (= (:scheme default) (:scheme request)))
     (is (= (:server-name default) (:server-name request)))
@@ -148,12 +147,12 @@
     (is (= "/continents" (:uri request)))))
 
 (deftest test-path-for-routes
-  (is (nil? (routes/path-for-routes routes nil)))
-  (is (nil? (routes/path-for-routes routes :not-existing)))
+  (is (nil? (routes/path-for-routes my-routes nil)))
+  (is (nil? (routes/path-for-routes my-routes :not-existing)))
   (are [name opts expected]
-    (is (= expected (routes/path-for-routes routes name opts)))
+    (is (= expected (routes/path-for-routes my-routes name opts)))
     :continents {} "/continents"
-    :continents {:query-params {:a 1 :b 2}} "/continents?b=2&a=1"
+    :continents {:query-params {:a 1 :b 2}} "/continents?a=1&b=2"
     :continent {} "/continents/:id"
     :continent {:id 1} "/continents/1"
     :continent {:path-params {:id 1}} "/continents/1"
@@ -212,8 +211,37 @@
              (map routes/serialize-route (vals new)))))))
 
 (deftest test-path-matches
-  (let [route (first (routes/path-matches routes "/continents/1"))]
+  (let [route (first (routes/path-matches my-routes "/continents/1"))]
     (is (= "/continents/1" (:uri route)))
     (is (= :continent (:route-name route)))
     (is (= "/continents/:id" (:path route)))
     (is (= {:id "1"} (:path-params route)))))
+
+
+
+(defroutes my-routes
+  [{:route-name :countries,
+    :path-re #"/countries",
+    :method :get,
+    :path "/countries",
+    :path-parts ["" "countries"],
+    :path-params []}
+   {:route-name :country,
+    :path-re #"/countries/([^/]+)",
+    :method :get,
+    :path-constraints {:id "([^/]+)"},
+    :path "/countries/:id",
+    :path-parts ["" "countries" :id],
+    :path-params [:id]}]
+  {:scheme :http
+   :server-name "example.com"
+   :server-port 80})
+
+
+(path-for :countries)
+(path-for :country {:path-params {:id 1}})
+
+(def server
+  {:scheme :https
+   :server-name "example.com"
+   :server-port 443})

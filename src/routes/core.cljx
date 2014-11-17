@@ -75,7 +75,9 @@
   [routes server route-name & [opts]]
   (if (find-route routes route-name)
     (if-let [route (resolve-route routes route-name opts)]
-      (format-url (merge route server opts)))))
+      (-> (merge route server opts)
+          (update-in [:query-params] #(into (sorted-map) %))
+          (format-url)))))
 
 (defn strip-path-re [route]
   (update-in route [:path-re] #(if %1 (replace %1 #"\\Q|\\E" ""))))
@@ -86,23 +88,18 @@
 (defn deserialize-route [route]
   (update-in route [:path-re] #(if %1 (re-pattern %1))))
 
-(defn- zip-routes [routes & [opts]]
+(defn zip-routes [routes & [opts]]
   (zipmap (map :route-name routes)
           (map #(merge opts %1) routes)))
 
 (defmacro defroutes
   "Define routes."
   [name routes & [opts]]
-  `(do
-     (def ~name
-       (let [routes# ~routes
-             opts# ~opts]
-         (zipmap (map :route-name routes#)
-                 (map (partial merge opts#) routes#))))
-     (defn ~'path-for [~'route-name & [~'opts]]
-       (routes.core/path-for-routes ~name ~'route-name ~'opts))
-     (defn ~'url-for [~'server ~'route-name & [~'opts]]
-       (routes.core/url-for-routes ~name ~'server ~'route-name ~'opts))))
+  `(do (def ~name (routes.core/zip-routes ~routes ~opts))
+       (defn ~'path-for [~'route-name & [~'opts]]
+         (routes.core/path-for-routes ~name ~'route-name ~'opts))
+       (defn ~'url-for [~'server ~'route-name & [~'opts]]
+         (routes.core/url-for-routes ~name ~'server ~'route-name ~'opts))))
 
 #+clj
 (defn read-routes
