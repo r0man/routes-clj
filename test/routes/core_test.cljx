@@ -216,32 +216,3 @@
     (is (= :continent (:route-name route)))
     (is (= "/continents/:id" (:path route)))
     (is (= {:id "1"} (:path-params route)))))
-
-
-
-(defroutes my-routes
-  [{:route-name :countries,
-    :path-re #"/countries",
-    :method :get,
-    :path "/countries",
-    :path-parts ["" "countries"],
-    :path-params []}
-   {:route-name :country,
-    :path-re #"/countries/([^/]+)",
-    :method :get,
-    :path-constraints {:id "([^/]+)"},
-    :path "/countries/:id",
-    :path-parts ["" "countries" :id],
-    :path-params [:id]}]
-  {:scheme :http
-   :server-name "example.com"
-   :server-port 80})
-
-
-(path-for :countries)
-(path-for :country {:path-params {:id 1}})
-
-(def server
-  {:scheme :https
-   :server-name "example.com"
-   :server-port 443})
