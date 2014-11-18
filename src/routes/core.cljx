@@ -5,8 +5,7 @@
             #+clj [clojure.pprint :refer [pprint]]
             #+clj [clojure.edn :as edn]))
 
-(def route-keys
-  [:method :route-name :path :path-params :path-re])
+(defrecord Router [server routes])
 
 (defn assoc-route [routes route-name path-re & [opts]]
   (let [route (merge {:method :get} opts)
@@ -20,8 +19,8 @@
 
 (defn find-route
   "Lookup the route `name` by keyword in `rou"
-  [routes name]
-  (get routes (keyword name)))
+  [router name]
+  (get (:routes router) (keyword name)))
 
 (defn expand-path
   "Format the `route` url by expanding :path-params in `opts`."
@@ -35,17 +34,18 @@
    (:path route) (:path-params route)))
 
 (defn resolve-route
-  "Find the route `name` in `routes` and return the Ring request."
+  "Find the route `name` in `router` and return the Ring request."
   ([request]
      request)
-  ([routes request]
+  ([router request]
      (if (map? request)
-       (resolve-route routes nil request)
-       (resolve-route routes request nil)))
-  ([routes name request]
-     (if-let [route (find-route routes name)]
-       (assoc (merge {:scheme :http :server-name "localhost"} route request)
-         :uri (expand-path route request))
+       (resolve-route router nil request)
+       (resolve-route router request nil)))
+  ([router name request]
+     (if-let [route (find-route router name)]
+       (let [server (:server router)]
+         (merge (:server router) route request
+                {:uri (expand-path route request)}))
        request)))
 
 (defn- match-path [path route]
@@ -55,33 +55,33 @@
       :path-params (zipmap (:path-params route) (rest matches)))))
 
 (defn path-matches
-  [routes path & [method]]
+  [router path & [method]]
   (let [method (or method :get)]
-    (->> (vals routes)
+    (->> (vals (:routes router))
          (filter #(= method (:method %1)))
          (map (partial match-path path))
          (remove nil?))))
 
 (defn path-by-route
-  "Find `route-name` in `routes` and return the path."
-  [routes route-name & [opts]]
-  (if (find-route routes route-name)
-    (let [request (resolve-route routes route-name opts)
+  "Find `route-name` in `router` and return the path."
+  [router route-name & [opts]]
+  (if (find-route router route-name)
+    (let [request (resolve-route router route-name opts)
           query (format-query-params (:query-params opts))]
       (str (:uri request) (if-not (blank? query) (str "?" query))))))
 
 (defn request-by-route
-  "Find `route-name` in `routes` and return the request map."
-  [routes server route-name & [opts]]
-  (if (find-route routes route-name)
-    (some-> (resolve-route routes route-name opts)
+  "Find `route-name` in `router` and return the request map."
+  [router server route-name & [opts]]
+  (if (find-route router route-name)
+    (some-> (resolve-route router route-name opts)
             (merge server opts)
             (update-in [:query-params] #(into (sorted-map) %)))))
 
 (defn url-by-route
-  "Find `route-name` in `routes` and return the url."
-  [routes server route-name & [opts]]
-  (some-> (request-by-route routes server route-name opts)
+  "Find `route-name` in `router` and return the url."
+  [router server route-name & [opts]]
+  (some-> (request-by-route router server route-name opts)
           (format-url)))
 
 (defn strip-path-re [route]
@@ -99,8 +99,10 @@
 
 (defmacro defroutes
   "Define routes."
-  [name routes & {:as opts}]
-  `(do (def ~name (routes.core/zip-routes ~routes ~opts))
+  [name routes & {:keys [server]}]
+  `(do (def ~name
+         (routes.core/->Router
+          ~server (routes.core/zip-routes ~routes)))
        (defn ~'path-for [~'route-name & [~'opts]]
          (routes.core/path-by-route ~name ~'route-name ~'opts))
        (defn ~'request-for [~'server ~'route-name & [~'opts]]

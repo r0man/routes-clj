@@ -46,9 +46,9 @@
     :path "/continents/:id",
     :path-parts ["" "continents" :id],
     :path-params [:id]}]
-  :scheme :http
-  :server-name "example.com"
-  :server-port 80)
+  :server {:scheme :http
+           :server-name "example.com"
+           :server-port 80})
 
 (deftest test-assoc-route
   (let [routes (routes/assoc-route {} :continents #"/continents")
@@ -66,7 +66,7 @@
 
 (deftest test-expand-path
   (are [name opts expected]
-    (is (= expected (routes/expand-path (get my-routes name) {:path-params opts})))
+    (is (= expected (routes/expand-path (get (:routes my-routes) name) {:path-params opts})))
     :continents {} "/continents"
     :continent {:id 1} "/continents/1"
     :create-continent {} "/continents"
