@@ -62,7 +62,7 @@
          (map (partial match-path path))
          (remove nil?))))
 
-(defn path-by-route
+(defn path-for
   "Find `route-name` in `router` and return the path."
   [router route-name & [opts]]
   (if (find-route router route-name)
@@ -70,7 +70,7 @@
           query (format-query-params (:query-params opts))]
       (str (:uri request) (if-not (blank? query) (str "?" query))))))
 
-(defn request-by-route
+(defn request-for
   "Find `route-name` in `router` and return the request map."
   [router server route-name & [opts]]
   (if (find-route router route-name)
@@ -78,10 +78,10 @@
             (merge server opts)
             (update-in [:query-params] #(into (sorted-map) %)))))
 
-(defn url-by-route
+(defn url-for
   "Find `route-name` in `router` and return the url."
   [router server route-name & [opts]]
-  (some-> (request-by-route router server route-name opts)
+  (some-> (request-for router server route-name opts)
           (format-url)))
 
 (defn strip-path-re [route]
@@ -104,11 +104,11 @@
          (routes.core/->Router
           ~server (routes.core/zip-routes ~routes)))
        (defn ~'path-for [~'route-name & [~'opts]]
-         (routes.core/path-by-route ~name ~'route-name ~'opts))
+         (routes.core/path-for ~name ~'route-name ~'opts))
        (defn ~'request-for [~'server ~'route-name & [~'opts]]
-         (routes.core/request-by-route ~name ~'server ~'route-name ~'opts))
+         (routes.core/request-for ~name ~'server ~'route-name ~'opts))
        (defn ~'url-for [~'server ~'route-name & [~'opts]]
-         (routes.core/url-by-route ~name ~'server ~'route-name ~'opts))))
+         (routes.core/url-for ~name ~'server ~'route-name ~'opts))))
 
 #+clj
 (defn read-routes

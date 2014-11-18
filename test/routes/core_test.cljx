@@ -146,11 +146,11 @@
     (is (= (:server-port default) (:server-port request)))
     (is (= "/continents" (:uri request)))))
 
-(deftest test-path-by-route
-  (is (nil? (routes/path-by-route my-routes nil)))
-  (is (nil? (routes/path-by-route my-routes :not-existing)))
+(deftest test-path-for
+  (is (nil? (path-for nil)))
+  (is (nil? (path-for :not-existing)))
   (are [name opts expected]
-    (is (= expected (routes/path-by-route my-routes name opts)))
+    (is (= expected (path-for name opts)))
     :continents {} "/continents"
     :continents {:query-params {:a 1 :b 2}} "/continents?a=1&b=2"
     :continent {} "/continents/:id"
@@ -163,7 +163,7 @@
     :update-continent {:id 1} "/continents/1"
     :update-continent {:path-params {:id 1}} "/continents/1"))
 
-(deftest test-url-by-route
+(deftest test-url-for
   (is (nil? (url-for nil nil)))
   (is (nil? (url-for {} nil)))
   (is (nil? (url-for nil :not-existing)))
