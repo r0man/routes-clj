@@ -5,7 +5,7 @@
             #+clj [clojure.pprint :refer [pprint]]
             #+clj [clojure.edn :as edn]))
 
-(defrecord Router [server routes])
+(defrecord Router [routes])
 
 (defn assoc-route [routes route-name path-re & [opts]]
   (let [route (merge {:method :get} opts)
@@ -36,17 +36,16 @@
 (defn resolve-route
   "Find the route `name` in `router` and return the Ring request."
   ([request]
-     request)
+   request)
   ([router request]
-     (if (map? request)
-       (resolve-route router nil request)
-       (resolve-route router request nil)))
+   (if (map? request)
+     (resolve-route router nil request)
+     (resolve-route router request nil)))
   ([router name request]
-     (if-let [route (find-route router name)]
-       (let [server (:server router)]
-         (merge (:server router) route request
-                {:uri (expand-path route request)}))
-       request)))
+   (if-let [route (find-route router name)]
+     (merge (dissoc router :routes) route request
+            {:uri (expand-path route request)})
+     request)))
 
 (defn- match-path [path route]
   (if-let [matches (re-matches (:path-re route) path)]
@@ -99,10 +98,11 @@
 
 (defmacro defroutes
   "Define routes."
-  [name routes & {:keys [server]}]
+  [name routes & {:as opts}]
   `(do (def ~name
-         (routes.core/->Router
-          ~server (routes.core/zip-routes ~routes)))
+         (-> (routes.core/zip-routes ~routes)
+             (routes.core/->Router)
+             (merge ~opts)))
        (defn ~'path-for [~'route-name & [~'opts]]
          (routes.core/path-for ~name ~'route-name ~'opts))
        (defn ~'request-for [~'server ~'route-name & [~'opts]]
