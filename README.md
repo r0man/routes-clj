@@ -50,6 +50,6 @@ Via Clojars: http://clojars.org/routes-clj
 
 ## License
 
-Copyright © 2012 r0man
+Copyright © 2014 r0man
 
 Distributed under the Eclipse Public License, the same as Clojure.
