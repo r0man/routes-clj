@@ -6,8 +6,6 @@ A Clojure & ClojureScript routing library.
 
 ## Installation
 
-Via Clojars: http://clojars.org/routes-clj
-
 [![Current Version](https://clojars.org/routes-clj/latest-version.svg)](https://clojars.org/routes-clj)
 
 ## Usage
