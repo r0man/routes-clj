@@ -50,16 +50,16 @@
 (defn- match-path [path route]
   (if-let [matches (re-matches (:path-re route) path)]
     (assoc route
-      :uri path
-      :path-params (zipmap (:path-params route) (rest matches)))))
+           :uri path
+           :path-params (zipmap (:path-params route) (rest matches)))))
 
 (defn path-matches
   [router path & [method]]
   (let [method (or method :get)]
     (->> (vals (:routes router))
-         (filter #(= method (:method %1)))
-         (map (partial match-path path))
-         (remove nil?))))
+      (filter #(= method (:method %1)))
+      (map (partial match-path path))
+      (remove nil?))))
 
 (defn path-for
   "Find `route-name` in `router` and return the path."
@@ -74,14 +74,20 @@
   [router server route-name & [opts]]
   (if (find-route router route-name)
     (some-> (resolve-route router route-name opts)
-            (merge server opts)
-            (update-in [:query-params] #(into (sorted-map) %)))))
+      (merge server opts)
+      (update-in [:query-params] #(into (sorted-map) %)))))
 
 (defn url-for
   "Find `route-name` in `router` and return the url."
   [router server route-name & [opts]]
   (some-> (request-for router server route-name opts)
-          (format-url)))
+    (format-url)))
+
+(defn href-for
+  "Find `route-name` in `router` and return a HAL reference map."
+  [router server route-name & [opts]]
+  (if-let [url (url-for router server route-name opts)]
+    {:href url}))
 
 (defn strip-path-re [route]
   (update-in route [:path-re] #(if %1 (replace %1 #"\\Q|\\E" ""))))
@@ -101,22 +107,24 @@
   [name routes & {:as opts}]
   `(do (def ~name
          (-> (routes.core/zip-routes ~routes)
-             (routes.core/->Router)
-             (merge ~opts)))
+           (routes.core/->Router)
+           (merge ~opts)))
        (defn ~'path-for [~'route-name & [~'opts]]
          (routes.core/path-for ~name ~'route-name ~'opts))
        (defn ~'request-for [~'server ~'route-name & [~'opts]]
          (routes.core/request-for ~name ~'server ~'route-name ~'opts))
        (defn ~'url-for [~'server ~'route-name & [~'opts]]
-         (routes.core/url-for ~name ~'server ~'route-name ~'opts))))
+         (routes.core/url-for ~name ~'server ~'route-name ~'opts))
+       (defn ~'href-for [~'server ~'route-name & [~'opts]]
+         (routes.core/href-for ~name ~'server ~'route-name ~'opts))))
 
 #+clj
 (defn read-routes
   "Read the routes in EDN format from `filename`."
   [filename]
   (->> (edn/read-string (slurp filename))
-       (map deserialize-route)
-       (zip-routes)))
+    (map deserialize-route)
+    (zip-routes)))
 
 #+clj
 (defn spit-routes
@@ -125,6 +133,6 @@
   (spit filename
         (with-out-str
           (->> (vals routes)
-               (map serialize-route)
-               (sort-by :route-name)
-               (pprint)))))
+            (map serialize-route)
+            (sort-by :route-name)
+            (pprint)))))

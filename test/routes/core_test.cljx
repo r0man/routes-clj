@@ -190,6 +190,33 @@
       nil :continents {:scheme :https :server-port 8080} "https://example.com:8080/continents"
       server :continents {:scheme :https :server-port 8080} "https://other.com:8080/continents")))
 
+(deftest test-href-for
+  (is (nil? (href-for nil nil)))
+  (is (nil? (href-for {} nil)))
+  (is (nil? (href-for nil :not-existing)))
+  (is (nil? (href-for {} :not-existing)))
+  (let [server {:scheme :http
+                :server-name "other.com"
+                :server-port 80}]
+    (are [server name opts expected]
+      (is (= expected (href-for server name opts)))
+      nil :continents {} {:href "http://example.com/continents"}
+      server :continents {} {:href "http://other.com/continents"}
+      server :continent {} {:href "http://other.com/continents/:id"}
+      server :continent {:id 1} {:href "http://other.com/continents/1"}
+      server :continent {:path-params {:id 1}} {:href "http://other.com/continents/1"}
+      server :continent {:path-params {:id 1} :query-params {:a 1}} {:href "http://other.com/continents/1?a=1"}
+      server :create-continent {} {:href "http://other.com/continents"}
+      server :delete-continent {:id 1} {:href "http://other.com/continents/1"}
+      server :delete-continent {:path-params {:id 1}} {:href "http://other.com/continents/1"}
+      server :update-continent {:id 1} {:href "http://other.com/continents/1"}
+      server :update-continent {:path-params {:id 1}} {:href "http://other.com/continents/1"}
+      server :continents {:server-port 80} {:href "http://other.com/continents"}
+      server :continents {:server-port 8080} {:href "http://other.com:8080/continents"}
+      server :continents {:scheme :https :server-port 443} {:href "https://other.com/continents"}
+      nil :continents {:scheme :https :server-port 8080} {:href "https://example.com:8080/continents"}
+      server :continents {:scheme :https :server-port 8080} {:href "https://other.com:8080/continents"})))
+
 (deftest test-request-for
   (are [request expected]
     (= (update-in expected [:path-re] str)
