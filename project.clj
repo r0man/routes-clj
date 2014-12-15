@@ -7,7 +7,7 @@
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[noencore "0.1.18"]
                  [org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2371" :scope "provided"]]
+                 [org.clojure/clojurescript "0.0-2411" :scope "provided"]]
   :aliases {"ci" ["do" ["difftest"] ["lint"]]
             "lint" ["do"  ["eastwood"]]
             "test-ancient" ["test"]}
