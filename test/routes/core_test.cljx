@@ -1,8 +1,8 @@
 (ns routes.core-test
   #+cljs (:require-macros [cemerick.cljs.test :refer [deftest is are]]
                           [routes.core :refer [defroutes]])
-  (:require [routes.core :as routes]
-            #+clj [clojure.edn :as edn]
+  (:require [no.en.core :refer [parse-url]]
+            [routes.core :as routes]
             #+clj [routes.core :refer [defroutes]]
             #+clj [clojure.test :refer :all]
             #+cljs [cemerick.cljs.test :as t]))
@@ -12,264 +12,302 @@
    :server-name "example.com"
    :server-port 80})
 
+(def spain
+  {:id 1 :iso-3166-1-alpha-2 "ES" :name "Spain"})
+
+(def mundaka
+  {:id 2 :name "Mundaka"})
+
 (defroutes my-routes
-  [{:route-name :continents,
-    :path-re #"/continents",
-    :method :get,
-    :path "/continents",
-    :path-parts ["" "continents"],
-    :path-params []}
-   {:route-name :continent,
-    :path-re #"/continents/([^/]+)",
-    :method :get,
-    :path-constraints {:id "([^/]+)"},
-    :path "/continents/:id",
-    :path-parts ["" "continents" :id],
-    :path-params [:id]}
-   {:route-name :create-continent,
-    :path-re #"/continents",
-    :method :post,
-    :path "/continents",
-    :path-parts ["" "continents"],
-    :path-params []}
-   {:route-name :delete-continent,
-    :path-re #"/continents/([^/]+)",
-    :method :delete,
-    :path-constraints {:id "([^/]+)"},
-    :path "/continents/:id",
-    :path-parts ["" "continents" :id],
-    :path-params [:id]}
-   {:route-name :update-continent,
-    :path-re #"/continents/([^/]+)",
-    :method :put,
-    :path-constraints {:id "([^/]+)"},
-    :path "/continents/:id",
-    :path-parts ["" "continents" :id],
-    :path-params [:id]}]
-  :scheme :http
-  :server-name "example.com"
-  :server-port 80)
+  ["/countries" :countries]
+  ["/countries/:id-:name" :country]
+  ["/countries/:id-:name/spots" :spots-in-country]
+  ["/countries/:id-:name/spots/:id-:name" :spot-in-country]
+  ["/spots" :spots]
+  ["/spots/:id-:name" :spot])
 
-(deftest test-assoc-route
-  (let [routes (routes/assoc-route {} :continents #"/continents")
-        route (:continents routes)]
-    (is (= :get (:method route)))
-    (is (= :continents (:route-name route)))
-    #+clj (is (= "/continents" (str (:path-re route))))
-    #+cljs (is (= "/\\/continents/" (str (:path-re route)))))
-  (let [routes (routes/assoc-route {} :create-continent #"/continents" {:method :post})
-        route (:create-continent routes)]
-    (is (= :post (:method route)))
-    (is (= :create-continent (:route-name route)))
-    #+clj (is (= "/continents" (str (:path-re route))))
-    #+cljs (is (= "/\\/continents/" (str (:path-re route))))))
+(defn- request
+  ([method url]
+   (request method url nil))
+  ([method url params]
+   (let [url (if (re-matches #"https?://" url) url (str "http://localhost" url))]
+     (assoc (parse-url url)
+            :request-method (keyword method)))))
 
-(deftest test-expand-path
-  (are [name opts expected]
-    (is (= expected (routes/expand-path (get (:routes my-routes) name) {:path-params opts})))
-    :continents {} "/continents"
-    :continent {:id 1} "/continents/1"
-    :create-continent {} "/continents"
-    :delete-continent {:id 1} "/continents/1"
-    :update-continent {:id 1} "/continents/1"))
+(deftest test-find-route
+  (is (nil? (routes/find-route my-routes :unknown)))
+  (let [route (routes/find-route my-routes :countries)]
+    (is (= (:name route) :countries))
+    (is (= (:path-params route) [[] []]))
+    (is (= (:path-parts route) ["" "countries"]))))
 
-(deftest test-resolve-route-empty-params
-  (let [request (routes/resolve-route my-routes :continent {})]
-    (is (= :get (:method request)))
-    (is (= :http (:scheme request)))
-    (is (= "example.com" (:server-name request)))
-    (is (= 80 (:server-port request)))
-    (is (= "/continents/:id" (:uri request)))))
-
-(deftest test-resolve-route-not-existing
-  (is (nil? (routes/resolve-route my-routes :not-existing)))
-  (let [request {:method :get :url "http://example.com"}]
-    (is (= request (routes/resolve-route my-routes :not-existing request)))))
-
-(deftest test-resolve-route-without-routes
-  (is (nil? (routes/resolve-route nil)))
-  (let [request {:method :get :url "http://example.com"}]
-    (is (= request (routes/resolve-route request)))))
-
-(deftest test-resolve-route-with-request
-  (let [request {:method :get :url "http://example.com"}]
-    (is (= request (routes/resolve-route my-routes request)))))
-
-(deftest test-resolve-route-continent
-  (let [request (routes/resolve-route my-routes :continent {:path-params {:id 1}})]
-    (is (= :get (:method request)))
-    (is (= :http (:scheme request)))
-    (is (= "example.com" (:server-name request)))
-    (is (= 80 (:server-port request)))
-    (is (= "/continents/1" (:uri request)))))
-
-(deftest test-resolve-route-continents
-  (let [request (routes/resolve-route my-routes :continents)]
-    (is (= :get (:method request)))
-    (is (= :http (:scheme request)))
-    (is (= "example.com" (:server-name request)))
-    (is (= 80 (:server-port request)))
-    (is (= "/continents" (:uri request)))))
-
-(deftest test-resolve-route-create-continent
-  (let [request (routes/resolve-route my-routes :create-continent {:edn-body {:id 1 :name "Europe"}})]
-    (is (= {:id 1 :name "Europe"} (:edn-body request)))
-    (is (= :post (:method request)))
-    (is (= :http (:scheme request)))
-    (is (= "example.com" (:server-name request)))
-    (is (= 80 (:server-port request)))
-    (is (= "/continents" (:uri request)))))
-
-(deftest test-resolve-route-delete-continent
-  (let [request (routes/resolve-route my-routes :delete-continent {:path-params {:id 1}})]
-    (is (= :delete (:method request)))
-    (is (= :http (:scheme request)))
-    (is (= "example.com" (:server-name request)))
-    (is (= 80 (:server-port request)))
-    (is (= "/continents/1" (:uri request)))))
-
-(deftest test-resolve-route-update-continent
-  (let [request (routes/resolve-route my-routes :update-continent {:edn-body {:id 1 :name "Europe"}})]
-    (is (= {:id 1 :name "Europe"} (:edn-body request)))
-    (is (= :put (:method request)))
-    (is (= :http (:scheme request)))
-    (is (= "example.com" (:server-name request)))
-    (is (= 80 (:server-port request)))
-    (is (= "/continents/1" (:uri request)))))
-
-(deftest test-resolve-route-override-defaults
-  (let [default {:scheme :https :server-name "other.com" :server-port 8080}
-        request (routes/resolve-route my-routes :continents default)]
-    (is (= :get (:method request)))
-    (is (= (:scheme default) (:scheme request)))
-    (is (= (:server-name default) (:server-name request)))
-    (is (= (:server-port default) (:server-port request)))
-    (is (= "/continents" (:uri request)))))
+(deftest test-split-args
+  (let [opts {:sort "asc"}]
+    (are [route args expected]
+      (= (routes/split-args (routes/find-route my-routes route) args)
+         expected)
+      :countries [] [[] []]
+      :countries [opts] [[] [opts]]
+      :country [spain] [[spain] []]
+      :country [spain opts] [[spain] [opts]]
+      :spots-in-country [spain] [[spain] []]
+      :spots-in-country [spain opts] [[spain] [opts]]
+      :spot-in-country [spain mundaka opts] [[spain mundaka] [opts]])))
 
 (deftest test-path-for
-  (is (nil? (path-for nil)))
-  (is (nil? (path-for :not-existing)))
-  (are [name opts expected]
-    (is (= expected (path-for name opts)))
-    :continents {} "/continents"
-    :continents {:query-params {:a 1 :b 2}} "/continents?a=1&b=2"
-    :continent {} "/continents/:id"
-    :continent {:id 1} "/continents/1"
-    :continent {:path-params {:id 1}} "/continents/1"
-    :continent {:path-params {:id 1} :query-params {:a 1}} "/continents/1?a=1"
-    :create-continent {} "/continents"
-    :delete-continent {:id 1} "/continents/1"
-    :delete-continent {:path-params {:id 1}} "/continents/1"
-    :update-continent {:id 1} "/continents/1"
-    :update-continent {:path-params {:id 1}} "/continents/1"))
+  (are [route args expected]
+    (= (apply routes/path-for my-routes route args) expected)
+    :countries [] "/countries"
+    :country [spain] "/countries/1-Spain"
+    :spots-in-country [spain] "/countries/1-Spain/spots"
+    :spot-in-country [spain mundaka] "/countries/1-Spain/spots/2-Mundaka"
+    :spots [] "/spots"
+    :spot [mundaka] "/spots/2-Mundaka"
+    :spots [{:sort "asc"}] "/spots?sort=asc"))
 
 (deftest test-url-for
-  (is (nil? (url-for nil nil)))
-  (is (nil? (url-for {} nil)))
-  (is (nil? (url-for nil :not-existing)))
-  (is (nil? (url-for {} :not-existing)))
-  (let [server {:scheme :http
-                :server-name "other.com"
-                :server-port 80}]
-    (are [server name opts expected]
-      (is (= expected (url-for server name opts)))
-      nil :continents {} "http://example.com/continents"
-      server :continents {} "http://other.com/continents"
-      server :continent {} "http://other.com/continents/:id"
-      server :continent {:id 1} "http://other.com/continents/1"
-      server :continent {:path-params {:id 1}} "http://other.com/continents/1"
-      server :continent {:path-params {:id 1} :query-params {:a 1}} "http://other.com/continents/1?a=1"
-      server :create-continent {} "http://other.com/continents"
-      server :delete-continent {:id 1} "http://other.com/continents/1"
-      server :delete-continent {:path-params {:id 1}} "http://other.com/continents/1"
-      server :update-continent {:id 1} "http://other.com/continents/1"
-      server :update-continent {:path-params {:id 1}} "http://other.com/continents/1"
-      server :continents {:server-port 80} "http://other.com/continents"
-      server :continents {:server-port 8080} "http://other.com:8080/continents"
-      server :continents {:scheme :https :server-port 443} "https://other.com/continents"
-      nil :continents {:scheme :https :server-port 8080} "https://example.com:8080/continents"
-      server :continents {:scheme :https :server-port 8080} "https://other.com:8080/continents")))
-
-(deftest test-href-for
-  (is (nil? (href-for nil nil)))
-  (is (nil? (href-for {} nil)))
-  (is (nil? (href-for nil :not-existing)))
-  (is (nil? (href-for {} :not-existing)))
-  (let [server {:scheme :http
-                :server-name "other.com"
-                :server-port 80}]
-    (are [server name opts expected]
-      (is (= expected (href-for server name opts)))
-      nil :continents {} {:href "http://example.com/continents"}
-      server :continents {} {:href "http://other.com/continents"}
-      server :continent {} {:href "http://other.com/continents/:id"}
-      server :continent {:id 1} {:href "http://other.com/continents/1"}
-      server :continent {:path-params {:id 1}} {:href "http://other.com/continents/1"}
-      server :continent {:path-params {:id 1} :query-params {:a 1}} {:href "http://other.com/continents/1?a=1"}
-      server :create-continent {} {:href "http://other.com/continents"}
-      server :delete-continent {:id 1} {:href "http://other.com/continents/1"}
-      server :delete-continent {:path-params {:id 1}} {:href "http://other.com/continents/1"}
-      server :update-continent {:id 1} {:href "http://other.com/continents/1"}
-      server :update-continent {:path-params {:id 1}} {:href "http://other.com/continents/1"}
-      server :continents {:server-port 80} {:href "http://other.com/continents"}
-      server :continents {:server-port 8080} {:href "http://other.com:8080/continents"}
-      server :continents {:scheme :https :server-port 443} {:href "https://other.com/continents"}
-      nil :continents {:scheme :https :server-port 8080} {:href "https://example.com:8080/continents"}
-      server :continents {:scheme :https :server-port 8080} {:href "https://other.com:8080/continents"})))
+  (are [route args expected]
+    (= (apply routes/url-for my-routes server route args) expected)
+    :countries [] "http://example.com/countries"
+    :country [spain] "http://example.com/countries/1-Spain"
+    :spots-in-country [spain] "http://example.com/countries/1-Spain/spots"
+    :spot-in-country [spain mundaka] "http://example.com/countries/1-Spain/spots/2-Mundaka"
+    :spots [] "http://example.com/spots"
+    :spot [mundaka] "http://example.com/spots/2-Mundaka"
+    :spots [{:sort "asc"}] "http://example.com/spots?sort=asc"))
 
 (deftest test-request-for
-  (are [request expected]
-    (= (update-in expected [:path-re] str)
-       (update-in request [:path-re] str))
-    (request-for server :continents)
-    {:path "/continents"
-     :method :get
-     :path-re #"/continents"
-     :path-parts ["" "continents"]
-     :server-port 80
-     :query-params {}
-     :uri "/continents"
+  (are [route args expected]
+    (= (apply routes/request-for my-routes server route args) expected)
+    :countries []
+    {:scheme :http
      :server-name "example.com"
-     :route-name :continents
-     :path-params []
-     :scheme :http}
-    (request-for server :continent {:path-params {:id 1}})
-    {:path "/continents/:id"
-     :method :get
-     :path-constraints {:id "([^/]+)"}
-     :path-re #"/continents/([^/]+)"
-     :path-parts ["" "continents" :id]
      :server-port 80
-     :query-params {}
-     :uri "/continents/1"
+     :request-method :get
+     :uri "/countries"}
+    :countries [{:query-params {:sort "asc"}}]
+    {:scheme :http
      :server-name "example.com"
-     :route-name :continent
-     :path-params {:id 1}
-     :scheme :http}))
+     :server-port 80
+     :request-method :get
+     :uri "/countries"
+     :query-params {:sort "asc"}}
+    :country [spain]
+    {:request-method :get
+     :scheme :http,
+     :server-name "example.com",
+     :server-port 80,
+     :uri "/countries/1-Spain",}
+    :spots-in-country [spain]
+    {:request-method :get
+     :scheme :http
+     :server-name "example.com"
+     :server-port 80
+     :uri "/countries/1-Spain/spots"}
+    :spot-in-country [spain mundaka]
+    {:request-method :get
+     :scheme :http
+     :server-name "example.com"
+     :server-port 80
+     :uri "/countries/1-Spain/spots/2-Mundaka"}
+    :spots []
+    {:request-method :get
+     :scheme :http
+     :server-name "example.com"
+     :server-port 80
+     :uri "/spots"}))
 
-#+clj
-(deftest test-read-routes
-  (let [routes (routes/read-routes "test-resources/routes.edn")]
-    (is (not (empty? routes)))
-    (let [route (:spots routes)]
-      (is (= :spots (:route-name route)))
-      (is (= :get (:method route)))
-      (is (= "/spots" (:path route)))
-      (is (= [] (:path-params route))))))
+(deftest test-route-compile
+  (are [route expected]
+    (let [compiled (routes/route-compile route)]
+      (is (= (:path-params compiled)
+             (:path-params expected)))
+      (is (= (:path-parts compiled)
+             (:path-parts expected)))
+      (is (= (str (:path-re compiled))
+             (str (:path-re expected)))))
+    nil nil
+    "" nil
 
-#+clj
-(deftest test-spit-routes
-  (let [old (routes/read-routes "test-resources/routes.edn")
-        filename "/tmp/test-spit-routes"]
-    (routes/spit-routes filename old)
-    (let [new (routes/read-routes filename)]
-      (is (= (set (keys old)) (set (keys new))))
-      (is (= (map routes/serialize-route (vals old))
-             (map routes/serialize-route (vals new)))))))
+    "/"
+    {:path-params []
+     :path-parts []
+     :path-re
+     #+clj "/"
+     #+cljs "/\\//"}
 
-(deftest test-path-matches
-  (let [route (first (routes/path-matches my-routes "/continents/1"))]
-    (is (= "/continents/1" (:uri route)))
-    (is (= :continent (:route-name route)))
-    (is (= "/continents/:id" (:path route)))
-    (is (= {:id "1"} (:path-params route)))))
+    "/:id"
+    {:path-params [[] [:id]]
+     :path-parts ["" ":id"]
+     :path-re
+     #+clj "/([^/]+)"
+     #+cljs "//([^/]+)/"}
+
+    "/:id-:iso-3166-1-alpha-2"
+    {:path-params [[] [:id :iso-3166-1-alpha-2]]
+     :path-parts ["" ":id-:iso-3166-1-alpha-2"]
+     :path-re
+     #+clj "/([^/]+)-([^/]+)"
+     #+cljs "//([^/]+)-([^/]+)/"}
+
+    "/countries"
+    {:path-params [[] []]
+     :path-parts ["" "countries"]
+     :path-re
+     #+clj "/countries"
+     #+cljs "//countries/"}
+
+    "/countries/:id"
+    {:path-params [[] [] [:id]]
+     :path-parts ["" "countries" ":id"]
+     :path-re
+     #+clj "/countries/([^/]+)"
+     #+cljs "//countries/([^/]+)/"}
+
+    "/countries/:id/spots"
+    {:path-params [[] [] [:id] []]
+     :path-parts ["" "countries" ":id" "spots"]
+     :path-re
+     #+clj "/countries/([^/]+)/spots"
+     #+cljs "//countries/([^/]+)/spots/"}))
+
+(deftest test-fixed-path
+  (are [path]
+    (routes/route-matches path (request :get path))
+    "/"
+    "/foo"
+    "/foo/bar"
+    "/foo/bar.html"))
+
+(deftest test-keyword-paths
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/:x"      "/foo"     {:x "foo"}
+    "/foo/:x"  "/foo/bar" {:x "bar"}
+    "/a/b/:c"  "/a/b/c"   {:c "c"}
+    "/:a/b/:c" "/a/b/c"   {:a "a", :c "c"}))
+
+;; ;; (deftest test-keywords-match-extensions
+;; ;;   (are [path uri params]
+;; ;;     (= (:params (routes/route-matches path (request :get uri))) params)
+;; ;;     "/foo.:ext" "/foo.txt" {:ext "txt"}
+;; ;;     "/:x.:y"    "/foo.txt" {:x "foo", :y "txt"}))
+
+(deftest test-hyphen-keywords
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/:foo-bar" "/baz" {:foo-bar "baz"}
+    "/:foo-"    "/baz" {:foo- "baz"}))
+
+(deftest test-underscore-keywords
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri)))
+       params)
+    "/:foo_bar" "/baz" {:foo_bar "baz"}
+    "/:_foo"    "/baz" {:_foo "baz"}))
+
+(deftest test-urlencoded-keywords
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/:x" "/foo%20bar" {:x "foo%20bar"}
+    "/:x" "/foo+bar"   {:x "foo+bar"}
+    "/:x" "/foo%5Cbar" {:x "foo%5Cbar"}))
+
+(deftest test-same-keyword-many-times
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/:x/:x/:x" "/a/b/c" {:x ["a" "b" "c"]}
+    "/:x/b/:x"  "/a/b/c" {:x ["a" "c"]}))
+
+(deftest test-non-ascii-keywords
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/:äñßOÔ"   "/abc"     {:äñßOÔ "abc"}
+    "/:ÁäñßOÔ"  "/abc"     {:ÁäñßOÔ "abc"}
+    "/:ä/:ش"   "/foo/bar" {:ä "foo" :ش "bar"}
+    "/:ä/:ä"    "/foo/bar" {:ä ["foo" "bar"]}
+    "/:Ä-ü"     "/baz"     {:Ä-ü "baz"}
+    "/:Ä_ü"     "/baz"     {:Ä_ü "baz"}))
+
+;; ;; (deftest test-wildcard-paths
+;; ;;   (are [path uri params]
+;; ;;     (= (:params (routes/route-matches path (request :get uri))) params)
+;; ;;        "/*"     "/foo"         {:* "foo"}
+;; ;;        "/*"     "/foo.txt"     {:* "foo.txt"}
+;; ;;        "/*"     "/foo/bar"     {:* "foo/bar"}
+;; ;;        "/foo/*" "/foo/bar/baz" {:* "bar/baz"}
+;; ;;        "/a/*/d" "/a/b/c/d"     {:* "b/c"}))
+
+(deftest test-escaped-chars
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/\\:foo" "/foo"  nil
+    ;; "/\\:foo" "/:foo" {}
+    ))
+
+(deftest test-inline-regexes
+  (are [path uri params]
+    (= (:params (routes/route-matches path (request :get uri))) params)
+    "/:x{\\d+}"   "/foo" nil
+    "/:x{\\d+}"   "/10"  {:x "10"}
+    "/:x{\\d{2}}" "/2"   nil
+    "/:x{\\d{2}}" "/20"  {:x "20"}
+    "/:x{\\d}/b"  "/3/b" {:x "3"}
+    "/:x{\\d}/b"  "/a/b" nil
+    "/a/:x{\\d}"  "/a/4" {:x "4"}
+    "/a/:x{\\d}"  "/a/b" nil))
+
+(deftest test-compiled-routes
+  (is (= (:params (routes/route-matches
+                   (routes/route-compile "/foo/:id")
+                   (request :get "/foo/bar")))
+         {:id "bar"})))
+
+;; ;; (deftest test-url-paths
+;; ;;   (is (routes/route-matches
+;; ;;        "http://localhost/"
+;; ;;        {:scheme  :http
+;; ;;         :headers {"host" "localhost"}
+;; ;;         :uri     "/"}))
+;; ;;   (is (routes/route-matches
+;; ;;        "//localhost/"
+;; ;;        {:scheme  :http
+;; ;;         :headers {"host" "localhost"}
+;; ;;         :uri     "/"}))
+;; ;;   (is (routes/route-matches
+;; ;;        "//localhost/"
+;; ;;        {:scheme  :https
+;; ;;         :headers {"host" "localhost"}
+;; ;;         :uri     "/"})))
+
+;; ;; (deftest test-url-port-paths
+;; ;;   (let [req (request :get "http://localhost:8080/")]
+;; ;;     (is (routes/route-matches "http://localhost:8080/" req))
+;; ;;     (is (not (routes/route-matches "http://localhost:7070/" req)))))
+
+(deftest test-unmatched-paths
+  (is (nil? (routes/route-matches "/foo" (request :get "/bar")))))
+
+(deftest test-path-info-matches
+  (is (routes/route-matches
+       "/bar" (-> (request :get "/foo/bar")
+                  (assoc :path-info "/bar")))))
+
+(deftest test-custom-matches
+  (let [route (routes/route-compile "/foo/:bar" {:bar #"\d+"})]
+    (is (not (routes/route-matches route (request :get "/foo/bar"))))
+    (is (not (routes/route-matches route (request :get "/foo/1x"))))
+    (is (routes/route-matches route (request :get "/foo/10")))))
+
+(deftest test-unused-regex-keys
+  (is (thrown? #+clj clojure.lang.ExceptionInfo
+               #+cljs js/Error
+               (routes/route-compile "/:foo" {:foa #"\d+"})))
+  (is (thrown? #+clj clojure.lang.ExceptionInfo
+               #+cljs js/Error
+               (routes/route-compile "/:foo" {:foo #"\d+" :bar #".*"}))))
+
+;; ;; (deftest test-invalid-inline-patterns
+;; ;;   (is (thrown? ExceptionInfo (route-compile "/:foo{")))
+;; ;;   (is (thrown? ExceptionInfo (route-compile "/:foo{\\d{2}")))
+;; ;;   (is (thrown? PatternSyntaxException (route-compile "/:foo{[a-z}"))))
