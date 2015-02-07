@@ -23,14 +23,14 @@
       ["/spots/:id-:name" :spot])
   #+END_SRC
 
-  #+BEGIN_SRC clojure :exports code :results verbatim
+  #+BEGIN_SRC clojure :exports both :results verbatim
     (path-for :countries)
   #+END_SRC
 
   #+RESULTS:
   : "/countries"
 
-  #+BEGIN_SRC clojure :exports code :results verbatim
+  #+BEGIN_SRC clojure :exports both :results verbatim
     (path-for :country {:id 1 :name "Spain"})
   #+END_SRC
 
@@ -44,21 +44,21 @@
        :server-port 443})
   #+END_SRC
 
-  #+BEGIN_SRC clojure :exports code :results verbatim
+  #+BEGIN_SRC clojure :exports both :results verbatim
     (url-for server :countries)
   #+END_SRC
 
   #+RESULTS:
   : "https://example.com/countries"
 
-  #+BEGIN_SRC clojure :exports code :results verbatim
+  #+BEGIN_SRC clojure :exports both :results verbatim
     (url-for server :country {:id 1 :name "Spain"})
   #+END_SRC
 
   #+RESULTS:
   : "https://example.com/countries/1-Spain"
 
-  #+BEGIN_SRC clojure :exports code :results verbatim
+  #+BEGIN_SRC clojure :exports both :results verbatim
     (request-for server :countries {:query-params {:sort "asc"}})
   #+END_SRC
 
