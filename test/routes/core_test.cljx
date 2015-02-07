@@ -171,6 +171,15 @@
      #+clj "/countries/([^/]+)/spots"
      #+cljs "//countries/([^/]+)/spots/"}))
 
+(deftest test-router-route-matches
+  (is (nil? (routes/route-matches my-routes (request :get "/unknown"))))
+  (let [route (routes/route-matches my-routes (request :get "/spots"))]
+    (is (= (:name route) :spots))
+    (is (= (str (:path-re route)) (str #"/spots"))))
+  (let [route (routes/route-matches my-routes (request :get "/spots/1-Mundaka"))]
+    (is (= (:name route) :spot))
+    (is (= (str (:path-re route)) (str #"/spots/([^/]+)-([^/]+)")))))
+
 (deftest test-fixed-path
   (are [path]
     (routes/route-matches path (request :get path))

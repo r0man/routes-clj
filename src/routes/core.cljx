@@ -142,6 +142,12 @@
   Route
   (route-matches [route request]
     (compiled-route-matches route request))
+  Router
+  (route-matches [router request]
+    (->> (:routes router)
+         (map #(compiled-route-matches % request))
+         (remove nil?)
+         (first)))
   #+clj String
   #+cljs string
   (route-matches [route request]

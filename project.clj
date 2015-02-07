@@ -35,8 +35,8 @@
                               "phantom" ["phantomjs" :runner "target/testable.js"]}}
   :deploy-repositories [["releases" :clojars]]
   :prep-tasks [["cljx" "once"]]
-  :profiles {:dev {:plugins [[com.cemerick/austin "0.1.7-SNAPSHOT"]
-                             [com.cemerick/clojurescript.test "0.3.3"]
+  :profiles {:dev {:dependencies [[com.cemerick/piggieback "0.1.5"]]
+                   :plugins [[com.cemerick/clojurescript.test "0.3.3"]
                              [com.keminglabs/cljx "0.5.0"]
                              [jonase/eastwood "0.2.1"]
                              [lein-cljsbuild "1.0.4"]
