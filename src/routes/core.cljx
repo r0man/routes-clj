@@ -208,7 +208,6 @@
     (let [[_ [opts]] (split-args route args)]
       (assoc (merge {:scheme :http
                      :server-name "localhost"
-                     :server-port 80
                      :request-method :get}
                     server opts)
              :uri (interpolate-path route args)))))
