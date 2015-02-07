@@ -39,7 +39,7 @@
                              [com.cemerick/clojurescript.test "0.3.3"]
                              [com.keminglabs/cljx "0.5.0"]
                              [jonase/eastwood "0.2.1"]
-                             [lein-cljsbuild "1.0.3"]
+                             [lein-cljsbuild "1.0.4"]
                              [lein-difftest "2.0.0"]]
                    :repl-options {:nrepl-middleware [cljx.repl-middleware/wrap-cljx]}
                    :test-paths ["target/test-classes"]}})
