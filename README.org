@@ -11,9 +11,14 @@
 
 * Usage
 
+  Require the library.
+
   #+BEGIN_SRC clojure :exports code :results silent
   (require '[routes.core :refer :all])
   #+END_SRC
+
+  Define routes by passing vectors of route pattern and route names do
+  =defroutes=.
 
   #+BEGIN_SRC clojure :exports code :results silent
     (defroutes my-routes
@@ -22,6 +27,8 @@
       ["/spots" :spots]
       ["/spots/:id-:name" :spot])
   #+END_SRC
+
+  Build URL paths by route name.
 
   #+BEGIN_SRC clojure :exports both :results verbatim
     (path-for :countries)
@@ -36,6 +43,8 @@
 
   #+RESULTS:
   : "/countries/1-Spain"
+
+  Build URL by route name.
 
   #+BEGIN_SRC clojure :exports code :results silent
     (def server
@@ -57,6 +66,8 @@
 
   #+RESULTS:
   : "https://example.com/countries/1-Spain"
+
+  Build Ring request maps by route name.
 
   #+BEGIN_SRC clojure :exports both :results verbatim
     (request-for server :countries {:query-params {:sort "asc"}})
