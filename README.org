@@ -1,0 +1,72 @@
+#+title: routes-clj
+#+author: roman
+#+LANGUAGE: en
+
+[[https://travis-ci.org/r0man/routes-clj][https://travis-ci.org/r0man/routes-clj.png]]
+[[http://jarkeeper.com/r0man/routes-clj][http://jarkeeper.com/r0man/routes-clj/status.png]]
+
+* Installation
+
+  [[https://clojars.org/routes-clj][https://clojars.org/routes-clj/latest-version.svg]]
+
+* Usage
+
+  #+BEGIN_SRC clojure :exports code :results silent
+  (require '[routes.core :refer :all])
+  #+END_SRC
+
+  #+BEGIN_SRC clojure :exports code :results silent
+    (defroutes my-routes
+      ["/countries" :countries]
+      ["/countries/:id-:name" :country]
+      ["/spots" :spots]
+      ["/spots/:id-:name" :spot])
+  #+END_SRC
+
+  #+BEGIN_SRC clojure :exports code :results verbatim
+    (path-for :countries)
+  #+END_SRC
+
+  #+RESULTS:
+  : "/countries"
+
+  #+BEGIN_SRC clojure :exports code :results verbatim
+    (path-for :country {:id 1 :name "Spain"})
+  #+END_SRC
+
+  #+RESULTS:
+  : "/countries/1-Spain"
+
+  #+BEGIN_SRC clojure :exports code :results silent
+    (def server
+      {:scheme :https
+       :server-name "example.com"
+       :server-port 443})
+  #+END_SRC
+
+  #+BEGIN_SRC clojure :exports code :results verbatim
+    (url-for server :countries)
+  #+END_SRC
+
+  #+RESULTS:
+  : "https://example.com/countries"
+
+  #+BEGIN_SRC clojure :exports code :results verbatim
+    (url-for server :country {:id 1 :name "Spain"})
+  #+END_SRC
+
+  #+RESULTS:
+  : "https://example.com/countries/1-Spain"
+
+  #+BEGIN_SRC clojure :exports code :results verbatim
+    (request-for server :countries {:query-params {:sort "asc"}})
+  #+END_SRC
+
+  #+RESULTS:
+  : {:uri "/countries", :query-params {:sort "asc"}, :server-port 443, :server-name "example.com", :scheme :https, :request-method :get}
+
+* License
+
+  Copyright © 2012-2015 r0man
+
+  Distributed under the Eclipse Public License, the same as Clojure.
