@@ -7,7 +7,7 @@
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[noencore "0.1.18"]
                  [org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2760" :scope "provided"]]
+                 [org.clojure/clojurescript "0.0-2816" :scope "provided"]]
   :aliases {"ci" ["do" ["cleantest"] ["lint"]]
             "cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]
             "deploy" ["do" "clean," "cljx" "once," "deploy" "clojars"]
