@@ -63,7 +63,11 @@
     :spot-in-country [spain mundaka] "/countries/1-Spain/spots/2-Mundaka"
     :spots [] "/spots"
     :spot [mundaka] "/spots/2-Mundaka"
-    :spots [{:sort "asc"}] "/spots?sort=asc"))
+    :spots [{:sort "asc"}] "/spots?sort=asc")
+  (is (thrown?
+       #+clj Exception
+       #+cljs js/Error
+       (routes/path-for my-routes :spot {}))))
 
 (deftest test-url-for
   (are [route args expected]
@@ -74,7 +78,11 @@
     :spot-in-country [spain mundaka] "http://example.com/countries/1-Spain/spots/2-Mundaka"
     :spots [] "http://example.com/spots"
     :spot [mundaka] "http://example.com/spots/2-Mundaka"
-    :spots [{:sort "asc"}] "http://example.com/spots?sort=asc"))
+    :spots [{:sort "asc"}] "http://example.com/spots?sort=asc")
+  (is (thrown?
+       #+clj Exception
+       #+cljs js/Error
+       (routes/url-for my-routes server :spot {}))))
 
 (deftest test-request-for
   (are [route args expected]

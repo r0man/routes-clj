@@ -187,10 +187,12 @@
   (->> (map (fn [part params arg]
               (reduce
                (fn [part param]
-                 (str/replace-first
-                  part
-                  (str param)
-                  (get arg param)))
+                 (if-let [value (get arg param)]
+                   (str/replace-first part (str param) value)
+                   (throw (ex-info "Can't find path parameter."
+                                   {:arg arg
+                                    :param param
+                                    :route route}))))
                part params))
             (:path-parts route args)
             (:path-params route args)
