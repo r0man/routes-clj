@@ -1,7 +1,8 @@
 (ns routes.core-test
   #+cljs (:require-macros [cemerick.cljs.test :refer [deftest is are]]
                           [routes.core :refer [defroutes]])
-  (:require [no.en.core :refer [parse-url]]
+  (:require [clojure.string :as str]
+            [no.en.core :refer [parse-url]]
             [routes.core :as routes]
             #+clj [routes.core :refer [defroutes]]
             #+clj [clojure.test :refer :all]
@@ -132,8 +133,10 @@
              (:path-params expected)))
       (is (= (:path-parts compiled)
              (:path-parts expected)))
-      (is (= (str (:path-re compiled))
+      ;; string representation differs on Node vs PhantomJS
+      (is (= (str/replace (str (:path-re compiled)) #"\\/" "/")
              (str (:path-re expected)))))
+
     nil nil
     "" nil
 
@@ -142,7 +145,7 @@
      :path-parts []
      :path-re
      #+clj "/"
-     #+cljs "/\\//"}
+     #+cljs "///"}
 
     "/:id"
     {:path-params [[] [:id]]
@@ -179,7 +182,7 @@
      #+clj "/countries/([^/]+)/spots"
      #+cljs "//countries/([^/]+)/spots/"}))
 
-(deftest test-router-route-matches
+(deftest test-route-matches
   (is (nil? (routes/route-matches my-routes (request :get "/unknown"))))
   (let [route (routes/route-matches my-routes (request :get "/spots"))]
     (is (= (:name route) :spots))
@@ -187,6 +190,14 @@
   (let [route (routes/route-matches my-routes (request :get "/spots/1-Mundaka"))]
     (is (= (:name route) :spot))
     (is (= (str (:path-re route)) (str #"/spots/([^/]+)-([^/]+)")))))
+
+(deftest test-route-matches-query-params
+  (let [request (request :get "/spots/1-Mundaka")
+        request (assoc request :query-params {:a 1})
+        route (routes/route-matches my-routes request)]
+    (is (= (:name route) :spot))
+    (is (= (str (:path-re route)) (str #"/spots/([^/]+)-([^/]+)")))
+    (is (= (:query-params route) {:a 1}))))
 
 (deftest test-fixed-path
   (are [path]

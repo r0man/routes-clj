@@ -121,17 +121,19 @@
   (or (:path-info request)
       (:uri request)))
 
-(defn- compiled-route-matches [route request]
+(defn- compiled-route-matches
+  "Match the the compiled `route` against the `request`."
+  [route request]
   (if-let [matches (re-matches (:path-re route) (path-info request))]
     (let [path-matches (path-matches route matches)]
-      (assoc route
-             :path-matches path-matches
-             :params (apply merge-with
-                            (fn [x y]
-                              (if (vector? x)
-                                (conj x y)
-                                [x y]))
-                            path-matches)))))
+      (merge request route
+             {:path-matches path-matches
+              :params (apply merge-with
+                             (fn [x y]
+                               (if (vector? x)
+                                 (conj x y)
+                                 [x y]))
+                             path-matches)}))))
 
 (defn compile-routes [routes]
   (vec (for [[pattern name] routes]
