@@ -10,7 +10,7 @@
 (defrecord Router [routes])
 
 (defn- regex-source [r]
-  (if r #+clj (str r) #+cljs (.-source r)))
+  (if r #?(:clj (str r) :cljs (.-source r))))
 
 (defn parse-path-pattern
   "Parse the path pattern from the `s`."
@@ -150,8 +150,7 @@
          (map #(compiled-route-matches % request))
          (remove nil?)
          (first)))
-  #+clj String
-  #+cljs string
+  #?(:clj String :cljs string)
   (route-matches [route request]
     (route-matches (route-compile route) request)))
 
@@ -233,11 +232,10 @@
                  :query-params query-params)
           (noencore/format-url)))))
 
-#+clj
-(defmacro defroutes
-  "Define routes."
-  [name & routes]
-  `(do (def ~name (routes.core/->Router ~(compile-routes routes)))
-       (def ~'path-for (partial routes.core/path-for ~name))
-       (def ~'request-for (partial routes.core/request-for ~name))
-       (def ~'url-for (partial routes.core/url-for ~name))))
+#?(:clj (defmacro defroutes
+          "Define routes."
+          [name & routes]
+          `(do (def ~name (routes.core/->Router ~(compile-routes routes)))
+               (def ~'path-for (partial routes.core/path-for ~name))
+               (def ~'request-for (partial routes.core/request-for ~name))
+               (def ~'url-for (partial routes.core/url-for ~name)))))
