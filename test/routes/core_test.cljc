@@ -1,12 +1,8 @@
 (ns routes.core-test
-  #+cljs (:require-macros [cemerick.cljs.test :refer [deftest is are]]
-                          [routes.core :refer [defroutes]])
   (:require [clojure.string :as str]
+            [clojure.test :refer [are deftest is]]
             [no.en.core :refer [parse-url]]
-            [routes.core :as routes]
-            #+clj [routes.core :refer [defroutes]]
-            #+clj [clojure.test :refer :all]
-            #+cljs [cemerick.cljs.test :as t]))
+            [routes.core :as routes #?(:clj :refer :cljs :refer-macros) [defroutes]]))
 
 (def server
   {:scheme :http
@@ -57,7 +53,7 @@
 
 (deftest test-path-for
   (are [route args expected]
-    (= (apply routes/path-for my-routes route args) expected)
+      (= (apply routes/path-for my-routes route args) expected)
     :countries [] "/countries"
     :country [spain] "/countries/1-Spain"
     :spots-in-country [spain] "/countries/1-Spain/spots"
@@ -66,13 +62,12 @@
     :spot [mundaka] "/spots/2-Mundaka"
     :spots [{:sort "asc"}] "/spots?sort=asc")
   (is (thrown?
-       #+clj Exception
-       #+cljs js/Error
+       #?(:clj Exception :cljs js/Error)
        (routes/path-for my-routes :spot {}))))
 
 (deftest test-url-for
   (are [route args expected]
-    (= (apply routes/url-for my-routes server route args) expected)
+      (= (apply routes/url-for my-routes server route args) expected)
     :countries [] "http://example.com/countries"
     :country [spain] "http://example.com/countries/1-Spain"
     :spots-in-country [spain] "http://example.com/countries/1-Spain/spots"
@@ -81,8 +76,7 @@
     :spot [mundaka] "http://example.com/spots/2-Mundaka"
     :spots [{:sort "asc"}] "http://example.com/spots?sort=asc")
   (is (thrown?
-       #+clj Exception
-       #+cljs js/Error
+       #?(:clj Exception :cljs js/Error)
        (routes/url-for my-routes server :spot {}))))
 
 (deftest test-request-for
@@ -128,14 +122,14 @@
 
 (deftest test-route-compile
   (are [route expected]
-    (let [compiled (routes/route-compile route)]
-      (is (= (:path-params compiled)
-             (:path-params expected)))
-      (is (= (:path-parts compiled)
-             (:path-parts expected)))
-      ;; string representation differs on Node vs PhantomJS
-      (is (= (str/replace (str (:path-re compiled)) #"\\/" "/")
-             (str (:path-re expected)))))
+      (let [compiled (routes/route-compile route)]
+        (is (= (:path-params compiled)
+               (:path-params expected)))
+        (is (= (:path-parts compiled)
+               (:path-parts expected)))
+        ;; string representation differs on Node vs PhantomJS
+        (is (= (str/replace (str (:path-re compiled)) #"\\/" "/")
+               (str (:path-re expected)))))
 
     nil nil
     "" nil
@@ -144,43 +138,43 @@
     {:path-params []
      :path-parts []
      :path-re
-     #+clj "/"
-     #+cljs "///"}
+     #?(:clj "/"
+        :cljs "///")}
 
     "/:id"
     {:path-params [[] [:id]]
      :path-parts ["" ":id"]
      :path-re
-     #+clj "/([^/]+)"
-     #+cljs "//([^/]+)/"}
+     #?(:clj "/([^/]+)"
+        :cljs "//([^/]+)/")}
 
     "/:id-:iso-3166-1-alpha-2"
     {:path-params [[] [:id :iso-3166-1-alpha-2]]
      :path-parts ["" ":id-:iso-3166-1-alpha-2"]
      :path-re
-     #+clj "/([^/]+)-([^/]+)"
-     #+cljs "//([^/]+)-([^/]+)/"}
+     #?(:clj "/([^/]+)-([^/]+)"
+        :cljs "//([^/]+)-([^/]+)/")}
 
     "/countries"
     {:path-params [[] []]
      :path-parts ["" "countries"]
      :path-re
-     #+clj "/countries"
-     #+cljs "//countries/"}
+     #?(:clj "/countries"
+        :cljs "//countries/")}
 
     "/countries/:id"
     {:path-params [[] [] [:id]]
      :path-parts ["" "countries" ":id"]
      :path-re
-     #+clj "/countries/([^/]+)"
-     #+cljs "//countries/([^/]+)/"}
+     #?(:clj "/countries/([^/]+)"
+        :cljs "//countries/([^/]+)/")}
 
     "/countries/:id/spots"
     {:path-params [[] [] [:id] []]
      :path-parts ["" "countries" ":id" "spots"]
      :path-re
-     #+clj "/countries/([^/]+)/spots"
-     #+cljs "//countries/([^/]+)/spots/"}))
+     #?(:clj "/countries/([^/]+)/spots"
+        :cljs "//countries/([^/]+)/spots/")}))
 
 (deftest test-route-matches
   (is (nil? (routes/route-matches my-routes (request :get "/unknown"))))
@@ -328,11 +322,11 @@
     (is (routes/route-matches route (request :get "/foo/10")))))
 
 (deftest test-unused-regex-keys
-  (is (thrown? #+clj clojure.lang.ExceptionInfo
-               #+cljs js/Error
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo
+                  :cljs js/Error)
                (routes/route-compile "/:foo" {:foa #"\d+"})))
-  (is (thrown? #+clj clojure.lang.ExceptionInfo
-               #+cljs js/Error
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo
+                  :cljs js/Error)
                (routes/route-compile "/:foo" {:foo #"\d+" :bar #".*"}))))
 
 ;; ;; (deftest test-invalid-inline-patterns
