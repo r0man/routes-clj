@@ -7,9 +7,9 @@
   :min-lein-version "2.6.1"
   :deploy-repositories [["releases" :clojars]]
   :dependencies [[noencore "0.3.3"]
-                 [org.clojure/clojure "1.9.0-alpha14"]]  
+                 [org.clojure/clojure "1.9.0-alpha14"]]
   :plugins [[jonase/eastwood "0.2.3"]
-            [lein-cljsbuild "1.1.4"]
+            [lein-cljsbuild "1.1.5"]
             [lein-difftest "2.0.0"]
             [lein-doo "0.1.7"]]
   :profiles {:dev {:dependencies [[com.cemerick/piggieback "0.2.1"]]

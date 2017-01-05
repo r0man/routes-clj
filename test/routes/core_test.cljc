@@ -41,8 +41,8 @@
 (deftest test-split-args
   (let [opts {:sort "asc"}]
     (are [route args expected]
-      (= (routes/split-args (routes/find-route my-routes route) args)
-         expected)
+        (= (routes/split-args (routes/find-route my-routes route) args)
+           expected)
       :countries [] [[] []]
       :countries [opts] [[] [opts]]
       :country [spain] [[spain] []]
@@ -81,44 +81,100 @@
 
 (deftest test-request-for
   (are [route args expected]
-    (= (apply routes/request-for my-routes server route args) expected)
+      (= (-> (apply routes/request-for my-routes server route args)
+             (update :route #(dissoc %1 :path-re)))
+         expected)
     :countries []
-    {:scheme :http
-     :server-name "example.com"
-     :server-port 80
-     :request-method :get
+    {:scheme :http,
+     :server-name "example.com",
+     :request-method :get,
+     :route
+     {:name :countries,
+      :path-params [[] []],
+      :path-parts ["" "countries"],
+      ;; :path-re "/countries",
+      :path-args [nil nil],
+      :path-keys []},
+     :server-port 80,
      :uri "/countries"}
+
     :countries [{:query-params {:sort "asc"}}]
     {:scheme :http
      :server-name "example.com"
      :server-port 80
      :request-method :get
      :uri "/countries"
-     :query-params {:sort "asc"}}
+     :query-params {:sort "asc"}
+     :route
+     {:name :countries,
+      :path-params [[] []],
+      :path-parts ["" "countries"],
+      ;; :path-re "/countries",
+      :path-args [nil nil],
+      :path-keys []}}
+
     :country [spain]
     {:request-method :get
      :scheme :http,
      :server-name "example.com",
      :server-port 80,
-     :uri "/countries/1-Spain",}
+     :uri "/countries/1-Spain"
+     :route
+     {:name :country,
+      :path-params [[] [] [:id :name]],
+      :path-parts ["" "countries" ":id-:name"],
+      ;; :path-re "/countries/([^/]+)-([^/]+)",
+      :path-args
+      [nil nil {:id 1, :iso-3166-1-alpha-2 "ES", :name "Spain"}],
+      :path-keys [1 "Spain"]}}
+
     :spots-in-country [spain]
     {:request-method :get
      :scheme :http
      :server-name "example.com"
      :server-port 80
-     :uri "/countries/1-Spain/spots"}
+     :uri "/countries/1-Spain/spots"
+     :route
+     {:name :spots-in-country,
+      :path-params [[] [] [:id :name] []],
+      :path-parts ["" "countries" ":id-:name" "spots"],
+      ;; :path-re "/countries/([^/]+)-([^/]+)/spots",
+      :path-args
+      [nil nil {:id 1, :iso-3166-1-alpha-2 "ES", :name "Spain"} nil],
+      :path-keys [1 "Spain"]}}
+
     :spot-in-country [spain mundaka]
     {:request-method :get
      :scheme :http
      :server-name "example.com"
      :server-port 80
-     :uri "/countries/1-Spain/spots/2-Mundaka"}
+     :uri "/countries/1-Spain/spots/2-Mundaka"
+     :route
+     {:name :spot-in-country,
+      :path-params [[] [] [:id :name] [] [:id :name]],
+      :path-parts ["" "countries" ":id-:name" "spots" ":id-:name"],
+      ;; :path-re "/countries/([^/]+)-([^/]+)/spots/([^/]+)-([^/]+)",
+      :path-args
+      [nil
+       nil
+       {:id 1, :iso-3166-1-alpha-2 "ES", :name "Spain"}
+       nil
+       {:id 2, :name "Mundaka"}],
+      :path-keys [1 "Spain" 2 "Mundaka"]}}
+
     :spots []
     {:request-method :get
      :scheme :http
      :server-name "example.com"
      :server-port 80
-     :uri "/spots"}))
+     :uri "/spots"
+     :route
+     {:name :spots,
+      :path-params [[] []],
+      :path-parts ["" "spots"],
+      ;; :path-re "/spots",
+      :path-args [nil nil],
+      :path-keys []}}))
 
 (deftest test-route-compile
   (are [route expected]
@@ -195,7 +251,7 @@
 
 (deftest test-fixed-path
   (are [path]
-    (routes/route-matches path (request :get path))
+      (routes/route-matches path (request :get path))
     "/"
     "/foo"
     "/foo/bar"
@@ -203,7 +259,7 @@
 
 (deftest test-keyword-paths
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/:x"      "/foo"     {:x "foo"}
     "/foo/:x"  "/foo/bar" {:x "bar"}
     "/a/b/:c"  "/a/b/c"   {:c "c"}
@@ -217,33 +273,33 @@
 
 (deftest test-hyphen-keywords
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/:foo-bar" "/baz" {:foo-bar "baz"}
     "/:foo-"    "/baz" {:foo- "baz"}))
 
 (deftest test-underscore-keywords
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri)))
-       params)
+      (= (:params (routes/route-matches path (request :get uri)))
+         params)
     "/:foo_bar" "/baz" {:foo_bar "baz"}
     "/:_foo"    "/baz" {:_foo "baz"}))
 
 (deftest test-urlencoded-keywords
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/:x" "/foo%20bar" {:x "foo%20bar"}
     "/:x" "/foo+bar"   {:x "foo+bar"}
     "/:x" "/foo%5Cbar" {:x "foo%5Cbar"}))
 
 (deftest test-same-keyword-many-times
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/:x/:x/:x" "/a/b/c" {:x ["a" "b" "c"]}
     "/:x/b/:x"  "/a/b/c" {:x ["a" "c"]}))
 
 (deftest test-non-ascii-keywords
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/:äñßOÔ"   "/abc"     {:äñßOÔ "abc"}
     "/:ÁäñßOÔ"  "/abc"     {:ÁäñßOÔ "abc"}
     "/:ä/:ش"   "/foo/bar" {:ä "foo" :ش "bar"}
@@ -262,14 +318,14 @@
 
 (deftest test-escaped-chars
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/\\:foo" "/foo"  nil
     ;; "/\\:foo" "/:foo" {}
     ))
 
 (deftest test-inline-regexes
   (are [path uri params]
-    (= (:params (routes/route-matches path (request :get uri))) params)
+      (= (:params (routes/route-matches path (request :get uri))) params)
     "/:x{\\d+}"   "/foo" nil
     "/:x{\\d+}"   "/10"  {:x "10"}
     "/:x{\\d{2}}" "/2"   nil

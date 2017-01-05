@@ -209,15 +209,31 @@
           uri (interpolate-path route args)]
       (noencore/format-url {:uri uri :query-params query-params}))))
 
+(defn path-keys
+  "Returns the path keys of `route` as a vector."
+  [route args]
+  (vec (mapcat (fn [params resource]
+                 (map resource params))
+               (:path-params route)
+               args)))
+
+(defn- apply-route-args
+  "Add :path-args and :path-keys to `route`. "
+  [route args]
+  (let [route (assoc route :path-args (path-args route args))]
+    (assoc route :path-keys (path-keys route (:path-args route)))))
+
 (defn request-for
   "Find the route with `name` in `routes` and return a Ring request
   map, using `server` and any additional options."
   [router server name & args]
   (if-let [route (find-route router name)]
-    (let [[_ [opts]] (split-args route args)]
+    (let [route (apply-route-args route args)
+          [_ [opts]] (split-args route args)]
       (assoc (merge {:scheme :http
                      :server-name "localhost"
-                     :request-method :get}
+                     :request-method :get
+                     :route (into {} route)}
                     server opts)
              :uri (interpolate-path route args)))))
 
