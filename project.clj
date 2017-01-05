@@ -1,4 +1,4 @@
-(defproject routes-clj "0.1.12-SNAPSHOT"
+(defproject routes-clj "0.1.12"
   :description "A Clojure & ClojureScript routing library."
   :url "https://github.com/r0man/routes-clj"
   :license {:name "Eclipse Public License"
